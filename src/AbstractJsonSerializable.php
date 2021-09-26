@@ -1,16 +1,20 @@
 <?php
 
 /**
+ * Abstract class to extend in order to use the maximum potentialities of JsonSerialize
  *
  * @package JsonSerializable
  */
 
 namespace Amk\JsonSerialize;
 
+/**
+ * Abstract class to extend in order to use the maximum potentialities of JsonSerialize
+ */
 abstract class AbstractJsonSerializable extends JsonSerialize implements \JsonSerializable
 {
     /**
-     * prepared json serialized object
+     * Prepared json serialized object
      *
      * @return mixed
      */
