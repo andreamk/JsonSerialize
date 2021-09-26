@@ -5,6 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
+            "Amk\\JsonSerialize\\Tests\\": "tests/",
             "Amk\\JsonSerialize\\": "src/"
         }
     },

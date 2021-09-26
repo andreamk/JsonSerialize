@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Amk\JsonSerialize\UnitTests;
+namespace Amk\JsonSerialize\Tests;
 
 use Amk\JsonSerialize\JsonSerialize;
 use PHPUnit\Framework\TestCase;
@@ -47,13 +47,10 @@ final class StdClassTest extends TestCase
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertEquals($value, $unserializedValue, 'Test stdClass object multiple level');
 
-        /*
         $obj->c->e = $obj;
-
-        $value  = $obj;
+        $value = $obj;
         $serializedValue = JsonSerialize::serialize($value);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
-        $this->assertEquals($value, $unserializedValue, 'Test stdClass object recursion');
-        */
+        $this->assertSame($unserializedValue->c->e, null, 'Test stdClass object recursion');
     }
 }
