@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Amk\JsonSerialize\UnitTests;
+namespace Amk\JsonSerialize\Tests;
 
 use Amk\JsonSerialize\JsonSerialize;
 use PHPUnit\Framework\TestCase;

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="DuplicatorPSR12" >
+<ruleset name="AmkPSR12Extended" >
 
     <exclude-pattern>/vendor/*</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
@@ -20,7 +20,8 @@
         <exclude name="PEAR.Commenting.ClassComment.MissingPackageTag"/>
         <exclude name="PEAR.Commenting.ClassComment.MissingAuthorTag"/>
         <exclude name="PEAR.Commenting.ClassComment.MissingLicenseTag"/>
-        <exclude name="PEAR.Commenting.ClassComment.MissingLinkTag"/>       
+        <exclude name="PEAR.Commenting.ClassComment.MissingLinkTag"/>   
+        <exclude name="PEAR.NamingConventions.ValidVariableName"/>
     </rule>
 
     <rule ref="Generic.Commenting.DocComment">
