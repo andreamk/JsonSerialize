@@ -1,0 +1,4 @@
+{
+    "phpSniffer.standard": "./tests/phpsniff_ruleset.xml",
+    "phpSniffer.autoDetect": true
+}
