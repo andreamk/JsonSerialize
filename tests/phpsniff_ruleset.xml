@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="DuplicatorPSR12" >
+<ruleset name="AmkPSR12Extended" >
 
     <exclude-pattern>/vendor/*</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
