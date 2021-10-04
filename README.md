@@ -45,3 +45,9 @@ It will generate this JSON
 
 Which if decoded by the method **JsonSerialize::unserialize**  will instantiate the same object.
 
+| First Header  | Second Header |
+| ------------- | ------------- |
+| ```PHP |  aaa |
+|   if (true) | aaa |
+| ```  | Content Cell  |
+| Content Cell  | Content Cell  |

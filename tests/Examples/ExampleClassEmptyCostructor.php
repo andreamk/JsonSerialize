@@ -14,7 +14,7 @@ use stdClass;
 /**
  * Example class
  */
-class ExampleClassEmptyCostructor extends AbstractJsonSerializable
+class ExampleClassEmptyCostructor
 {
     /** @var string */
     public $publicProp = 'public';

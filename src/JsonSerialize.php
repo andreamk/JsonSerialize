@@ -9,15 +9,14 @@
 namespace Amk\JsonSerialize;
 
 use Exception;
-use ReflectionClass;
-use ReflectionObject;
 
 /**
  * This class serializes and deserializes a variable in json keeping the class type and saving also private objects
  */
-class JsonSerialize
+class JsonSerialize extends AbstractJsonSerializeObjData
 {
-    const CLASS_KEY_FOR_JSON_SERIALIZE = '==_CL_==_==';
+    const CLASS_KEY_FOR_JSON_SERIALIZE = 'CL_-=_-=';
+    const JSON_SERIALIZE_SKIP_CLASS_NAME = 1073741824; // 30 bit mask
 
     /**
      * Return json string
@@ -33,8 +32,8 @@ class JsonSerialize
     public static function serialize($value, $flags = 0, $depth = 512)
     {
         return version_compare(PHP_VERSION, '5.5', '>=') ?
-            json_encode(self::valueToJsonData($value), $flags, $depth) :
-            json_encode(self::valueToJsonData($value), $flags);
+            json_encode(self::valueToJsonData($value, $flags), $flags, $depth) :
+            json_encode(self::valueToJsonData($value, $flags), $flags);
     }
 
     /**
@@ -57,8 +56,8 @@ class JsonSerialize
         }
 
         return version_compare(PHP_VERSION, '5.5', '>=') ?
-            json_encode(self::objectToJsonData($obj, [], $skipProps), $flags, $depth) :
-            json_encode(self::objectToJsonData($obj, [], $skipProps), $flags);
+            json_encode(self::objectToJsonData($obj, $flags, [], $skipProps), $flags, $depth) :
+            json_encode(self::objectToJsonData($obj, $flags, [], $skipProps), $flags);
     }
 
     /**
@@ -90,7 +89,7 @@ class JsonSerialize
      *
      * @return object
      */
-    public static function unserializeToObject($json, $obj, $depth = 512, $flags = 0)
+    public static function unserializeToObj($json, $obj, $depth = 512, $flags = 0)
     {
         if (!is_object($obj)) {
             throw new Exception('invalid obj param');
@@ -100,145 +99,6 @@ class JsonSerialize
         if ($result !== $obj) {
             throw new Exception('invalid obj param');
         }
-    }
-
-    /**
-     * Convert object to array with private and protected proprieties.
-     * Private parent class proprieties aren't considered.
-     *
-     * @param object   $obj        obejct to serialize
-     * @param string[] $objParents objs parents unique objects hash list
-     * @param string[] $skipProps  properties to skip
-     *
-     * @return array
-     */
-    protected static function objectToJsonData($obj, $objParents = [], $skipProps = [])
-    {
-        $reflect = new ReflectionObject($obj);
-        $result  = [ self::CLASS_KEY_FOR_JSON_SERIALIZE => $reflect->name ];
-
-        if (is_subclass_of($obj, AbstractJsonSerializable::getAbstractJsonSerializableClass())) {
-            $skipProps = array_unique(array_merge($skipProps, $obj->jsonSleep()));
-        }
-
-        // Get all props of current class but not props private of parent class
-        foreach ($reflect->getProperties() as $prop) {
-            $prop->setAccessible(true);
-            $propName  = $prop->getName();
-            if ($prop->isStatic() || in_array($propName, $skipProps)) {
-                continue;
-            }
-            $propValue = $prop->getValue($obj);
-            $result[$propName] = self::valueToJsonData($propValue, $objParents);
-        }
-
         return $result;
-    }
-
-    /**
-     * Recursive parse values, all objects are transformed to array
-     *
-     * @param mixed    $value      valute to parse
-     * @param string[] $objParents objs parents unique hash ids
-     *
-     * @return mixed
-     */
-    protected static function valueToJsonData($value, $objParents = [])
-    {
-        if (is_scalar($value) || is_null($value)) {
-            return $value;
-        } elseif (is_object($value)) {
-            $objHash = spl_object_hash($value);
-            if (in_array($objHash, $objParents)) {
-                // prevent recursion
-                /** @todo store recursion in serialized json and restore it */
-                return null;
-            }
-            $objParents[] = $objHash;
-            return self::objectToJsonData($value, $objParents);
-        } elseif (is_array($value)) {
-            $result = [];
-            foreach ($value as $key => $arrayVal) {
-                $result[$key] = self::valueToJsonData($arrayVal, $objParents);
-            }
-            return $result;
-        } else {
-            return $value;
-        }
-    }
-
-    /**
-     * Return value from json decode data
-     *
-     * @param mixed       $value  value
-     * @param object|null $newObj if is new create new object of fill the object param
-     *
-     * @return mixed
-     */
-    protected static function jsonDataToValue($value, $newObj = null)
-    {
-        if (is_scalar($value) || is_null($value)) {
-            return $value;
-        } elseif (($newClassName = self::getClassFromArray($value)) !== false) {
-            if (is_object($newObj)) {
-                // use the passed object as a parameter instead of creating a new one
-            } elseif (class_exists($newClassName)) {
-                $classReflect = new ReflectionClass($newClassName);
-                $newObj = $classReflect->newInstanceWithoutConstructor();
-            } else {
-                $newObj = new \StdClass();
-            }
-
-            if ($newObj instanceof \stdClass) {
-                foreach ($value as $arrayProp => $arrayValue) {
-                    if ($arrayProp == self::CLASS_KEY_FOR_JSON_SERIALIZE) {
-                        continue;
-                    }
-                    $newObj->{$arrayProp} = self::jsonDataToValue($arrayValue);
-                }
-            } else {
-                $reflect = new ReflectionObject($newObj);
-                foreach ($reflect->getProperties() as $prop) {
-                    $prop->setAccessible(true);
-                    $propName = $prop->getName();
-                    if (!isset($value[$propName]) || $prop->isStatic()) {
-                        continue;
-                    }
-                    $prop->setValue($newObj, self::jsonDataToValue($value[$propName]));
-                }
-
-                if (is_subclass_of($newObj, AbstractJsonSerializable::getAbstractJsonSerializableClass())) {
-                    $method = $reflect->getMethod('jsonWakeup');
-                    $method->setAccessible(true);
-                    $method->invoke($newObj);
-                }
-            }
-
-            return $newObj;
-        } elseif (is_array($value)) {
-            $result = [];
-            foreach ($value as $key => $arrayVal) {
-                $result[$key] = self::jsonDataToValue($arrayVal);
-            }
-            return $result;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Return class name from array values
-     *
-     * @param array $array array data
-     *
-     * @return bool|string  false if prop not found
-     */
-    protected static function getClassFromArray($array)
-    {
-        if (isset($array[self::CLASS_KEY_FOR_JSON_SERIALIZE])) {
-            return $array[self::CLASS_KEY_FOR_JSON_SERIALIZE];
-        } else {
-            return false;
-        }
     }
 }

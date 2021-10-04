@@ -35,6 +35,24 @@ final class ExtendClassesTest extends TestCase
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertEquals($value, $unserializedValue, 'Test class with empty costructor');
 
-        echo $serializedValue;
+        $value->publicProp = 'change prop';
+        $serializedValue = JsonSerialize::serialize($value, JSON_PRETTY_PRINT);
+        $unserializedValue = new ExampleClassEmptyCostructor();
+        JsonSerialize::unserializeToObj($serializedValue, $unserializedValue);
+        $this->assertEquals($value, $unserializedValue, 'Test unserializeToObj with class with empty costructor');
+
+
+        $serializedValue = JsonSerialize::serializeObj(
+            $value,
+            [ 'subExample', 'stdObject' ],
+            JSON_PRETTY_PRINT | JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME
+        );
+        $unserializedValue = JsonSerialize::unserialize($serializedValue);
+        $check_value = [
+            "publicProp" => "change prop",
+            "protectedProp" => "protected_updated",
+            "privateProp" => "private_updated"
+        ];
+        $this->assertEquals($check_value, $unserializedValue, 'Test sierialize obj with skip props and skip class name');
     }
 }

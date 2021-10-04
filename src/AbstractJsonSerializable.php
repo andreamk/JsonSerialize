@@ -11,7 +11,7 @@ namespace Amk\JsonSerialize;
 /**
  * Abstract class to extend in order to use the maximum potentialities of JsonSerialize
  */
-abstract class AbstractJsonSerializable extends JsonSerialize implements \JsonSerializable
+abstract class AbstractJsonSerializable extends AbstractJsonSerializeObjData implements \JsonSerializable
 {
     /**
      * Prepared json serialized object
@@ -20,7 +20,7 @@ abstract class AbstractJsonSerializable extends JsonSerialize implements \JsonSe
      */
     final public function jsonSerialize()
     {
-        return self::objectToJsonData($this, [], $this->jsonSleep());
+        return self::objectToJsonData($this, 0, [], $this->jsonSleep());
     }
 
     /**
