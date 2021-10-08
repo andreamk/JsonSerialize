@@ -14,7 +14,7 @@ use stdClass;
 /**
  * Example class
  */
-class ExampleClassEmptyCostructor extends AbstractJsonSerializable
+class ExampleClassEmptyCostructor
 {
     /** @var string */
     public $publicProp = 'public';
@@ -47,6 +47,23 @@ class ExampleClassEmptyCostructor extends AbstractJsonSerializable
         $this->stdObject = new stdClass();
         $this->stdObject->a = 1;
         $this->stdObject->b = 2;
+    }
+
+    /**
+     * Return object to associative array
+     *
+     * @return array
+     */
+    public function getArray()
+    {
+        $result = get_object_vars($this);
+        if (is_object($result['stdObject'])) {
+            $result['stdObject'] = (array) $result['stdObject'];
+        }
+        if (is_object($result['subExample'])) {
+            $result['subExample'] = $this->subExample->getArray();
+        }
+        return $result;
     }
 
     /**

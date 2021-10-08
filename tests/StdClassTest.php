@@ -52,5 +52,14 @@ final class StdClassTest extends TestCase
         $serializedValue = JsonSerialize::serialize($value);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($unserializedValue->c->e, null, 'Test stdClass object recursion');
+
+        $obj = new stdClass();
+        $obj->a = 1;
+        $obj->b = [1,2,3];
+
+        $serializedValue = JsonSerialize::serialize($obj, JSON_PRETTY_PRINT | JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $unserializedValue = new stdClass();
+        $unserializedValue = JsonSerialize::unserializeToObj($serializedValue, $unserializedValue);
+        $this->assertEquals($obj, $unserializedValue, 'Test JSON_SERIALIZE_SKIP_CLASS_NAME flag');
     }
 }
