@@ -15,9 +15,6 @@ use Exception;
  */
 class JsonSerialize extends AbstractJsonSerializeObjData
 {
-    const CLASS_KEY_FOR_JSON_SERIALIZE = 'CL_-=_-=';
-    const JSON_SERIALIZE_SKIP_CLASS_NAME = 1073741824; // 30 bit mask
-
     /**
      * Return json string
      *
@@ -34,30 +31,6 @@ class JsonSerialize extends AbstractJsonSerializeObjData
         return version_compare(PHP_VERSION, '5.5', '>=') ?
             json_encode(self::valueToJsonData($value, $flags), $flags, $depth) :
             json_encode(self::valueToJsonData($value, $flags), $flags);
-    }
-
-    /**
-     * Return json string, equivalent to serialize, but with the possibility to skip some properties of object
-     * Accept only object
-     *
-     * @param object   $obj       object to serialize
-     * @param string[] $skipProps properties to skip
-     * @param integer  $flags     json_encode flags
-     * @param integer  $depth     json_encode depth
-     *
-     * @link https://www.php.net/manual/en/function.json-encode.php
-     *
-     * @return string
-     */
-    public static function serializeObj($obj, $skipProps = [], $flags = 0, $depth = 512)
-    {
-        if (!is_object($obj)) {
-            throw new Exception('Invalid obj param');
-        }
-
-        return version_compare(PHP_VERSION, '5.5', '>=') ?
-            json_encode(self::objectToJsonData($obj, $flags, [], $skipProps), $flags, $depth) :
-            json_encode(self::objectToJsonData($obj, $flags, [], $skipProps), $flags);
     }
 
     /**
@@ -94,11 +67,10 @@ class JsonSerialize extends AbstractJsonSerializeObjData
         if (!is_object($obj)) {
             throw new Exception('invalid obj param');
         }
-
-        $result = self::jsonDataToValue(json_decode($json, true, $depth, $flags), $obj);
-        if ($result !== $obj) {
-            throw new Exception('invalid obj param');
+        $value = json_decode($json, true, $depth, $flags);
+        if (!is_array($value)) {
+            throw new Exception('json value isn\'t an array');
         }
-        return $result;
+        return self::fillObjFromValue($value, $obj);
     }
 }

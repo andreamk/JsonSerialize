@@ -50,6 +50,23 @@ class ExampleClassEmptyCostructor
     }
 
     /**
+     * Return object to associative array
+     *
+     * @return array
+     */
+    public function getArray()
+    {
+        $result = get_object_vars($this);
+        if (is_object($result['stdObject'])) {
+            $result['stdObject'] = (array) $result['stdObject'];
+        }
+        if (is_object($result['subExample'])) {
+            $result['subExample'] = $this->subExample->getArray();
+        }
+        return $result;
+    }
+
+    /**
      * Init sub class
      *
      * @return void

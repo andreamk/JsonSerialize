@@ -22,6 +22,7 @@
         <exclude name="PEAR.Commenting.ClassComment.MissingLicenseTag"/>
         <exclude name="PEAR.Commenting.ClassComment.MissingLinkTag"/>   
         <exclude name="PEAR.NamingConventions.ValidVariableName"/>
+        <exclude name="PEAR.WhiteSpace"/>
     </rule>
 
     <rule ref="Generic.Commenting.DocComment">

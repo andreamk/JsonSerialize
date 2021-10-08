@@ -8,6 +8,7 @@
 
 namespace Amk\JsonSerialize;
 
+use Exception;
 use ReflectionClass;
 use ReflectionObject;
 
@@ -26,27 +27,35 @@ abstract class AbstractJsonSerializeObjData
      * @param object   $obj        obejct to serialize
      * @param int      $flags      flags bitmask
      * @param string[] $objParents objs parents unique objects hash list
-     * @param string[] $skipProps  properties to skip
      *
      * @return array
      */
-    protected static function objectToJsonData($obj, $flags = 0, $objParents = [], $skipProps = [])
+    final protected static function objectToJsonData($obj, $flags = 0, $objParents = [])
     {
         $reflect = new ReflectionObject($obj);
         if (!($flags & self::JSON_SERIALIZE_SKIP_CLASS_NAME)) {
             $result  = [ self::CLASS_KEY_FOR_JSON_SERIALIZE => $reflect->name ];
         }
-        if (is_subclass_of($obj, AbstractJsonSerializable::getAbstractJsonSerializableClass())) {
-            $skipProps = array_unique(array_merge($skipProps, $obj->jsonSleep()));
+
+        if (method_exists($obj, '__sleep')) {
+            $includeProps = $obj->__sleep();
+            if (!is_array($includeProps)) {
+                throw new Exception('__sleep method must return an array');
+            }
+        } else {
+            $includeProps = true;
         }
 
-        // Get all props of current class but not props private of parent class
+        // Get all props of current class but not props private of parent class and static props
         foreach ($reflect->getProperties() as $prop) {
-            $prop->setAccessible(true);
-            $propName  = $prop->getName();
-            if ($prop->isStatic() || in_array($propName, $skipProps)) {
+            if ($prop->isStatic()) {
                 continue;
             }
+            $propName  = $prop->getName();
+            if ($includeProps !==  true && !in_array($propName, $includeProps)) {
+                continue;
+            }
+            $prop->setAccessible(true);
             $propValue = $prop->getValue($obj);
             $result[$propName] = self::valueToJsonData($propValue, $flags, $objParents);
         }
@@ -63,98 +72,107 @@ abstract class AbstractJsonSerializeObjData
      *
      * @return mixed
      */
-    protected static function valueToJsonData($value, $flags = 0, $objParents = [])
+    final protected static function valueToJsonData($value, $flags = 0, $objParents = [])
     {
-        if (is_scalar($value) || is_null($value)) {
-            return $value;
-        } elseif (is_object($value)) {
-            $objHash = spl_object_hash($value);
-            if (in_array($objHash, $objParents)) {
-                // prevent recursion
-                /** @todo store recursion in serialized json and restore it */
+        switch (gettype($value)) {
+            case "boolean":
+            case "integer":
+            case "double":
+            case "string":
+            case "NULL":
+                return $value;
+            case "array":
+                $result = [];
+                foreach ($value as $key => $arrayVal) {
+                    $result[$key] = self::valueToJsonData($arrayVal, $flags, $objParents);
+                }
+                return $result;
+            case "object":
+                $objHash = spl_object_hash($value);
+                if (in_array($objHash, $objParents)) {
+                    // prevent infinite recursion loop
+                    return null;
+                }
+                $objParents[] = $objHash;
+                return self::objectToJsonData($value, $flags, $objParents);
+            case "resource":
+            case "resource (closed)":
+            case "unknown type":
+            default:
                 return null;
-            }
-            $objParents[] = $objHash;
-            return self::objectToJsonData($value, $flags, $objParents);
-        } elseif (is_array($value)) {
-            $result = [];
-            foreach ($value as $key => $arrayVal) {
-                $result[$key] = self::valueToJsonData($arrayVal, $flags, $objParents);
-            }
-            return $result;
-        } else {
-            return $value;
         }
     }
 
     /**
-     * Return value from json decode data
+     * Return value from json decoded data
      *
-     * @param mixed       $value  value
-     * @param object|null $newObj if is null create new object of fill the passed object by param
+     * @param mixed $value json decoded data
      *
      * @return mixed
      */
-    protected static function jsonDataToValue($value, $newObj = null)
+    final protected static function jsonDataToValue($value)
     {
-        if (is_scalar($value) || is_null($value)) {
-            return $value;
-        } elseif (is_object($newObj)) {
-            return self::fillObjFromValue($value, $newObj);
-        } elseif (($newClassName = self::getClassFromArray($value)) !== false) {
-            if (class_exists($newClassName)) {
-                $classReflect = new ReflectionClass($newClassName);
-                $newObj = $classReflect->newInstanceWithoutConstructor();
-            } else {
-                $newObj = new \StdClass();
-            }
-            return self::fillObjFromValue($value, $newObj);
-        } elseif (is_array($value)) {
-            $result = [];
-            foreach ($value as $key => $arrayVal) {
-                $result[$key] = self::jsonDataToValue($arrayVal);
-            }
-            return $result;
-        } else {
-            return null;
+        switch (gettype($value)) {
+            case 'array':
+                if (($newClassName = self::getClassFromArray($value)) === false) {
+                    $result = [];
+                    foreach ($value as $key => $arrayVal) {
+                        $result[$key] = self::jsonDataToValue($arrayVal);
+                    }
+                } else {
+                    if (class_exists($newClassName)) {
+                        $classReflect = new ReflectionClass($newClassName);
+                        $newObj = $classReflect->newInstanceWithoutConstructor();
+                    } else {
+                        $newObj = new \StdClass();
+                    }
+                    $result = self::fillObjFromValue($value, $newObj);
+                }
+                return $result;
+            case 'boolean':
+            case 'integer':
+            case 'double':
+            case 'string':
+            case "NULL":
+                return $value;
+            default:
+                return null;
         }
     }
 
     /**
      * Fill passed object from array values
      *
-     * @param array  $value  value from json data
-     * @param object $newObj object to fill with json data
+     * @param array  $value value from json data
+     * @param object $obj   object to fill with json data
      *
      * @return object
      */
-    protected static function fillObjFromValue($value, $newObj)
+    final protected static function fillObjFromValue($value, $obj)
     {
-        if ($newObj instanceof \stdClass) {
+        if ($obj instanceof \stdClass) {
             foreach ($value as $arrayProp => $arrayValue) {
                 if ($arrayProp == self::CLASS_KEY_FOR_JSON_SERIALIZE) {
                     continue;
                 }
-                $newObj->{$arrayProp} = self::jsonDataToValue($arrayValue);
+                $obj->{$arrayProp} = self::jsonDataToValue($arrayValue);
             }
         } else {
-            $reflect = new ReflectionObject($newObj);
+            $reflect = new ReflectionObject($obj);
             foreach ($reflect->getProperties() as $prop) {
                 $prop->setAccessible(true);
                 $propName = $prop->getName();
                 if (!isset($value[$propName]) || $prop->isStatic()) {
                     continue;
                 }
-                $prop->setValue($newObj, self::jsonDataToValue($value[$propName]));
+                $prop->setValue($obj, self::jsonDataToValue($value[$propName]));
             }
 
-            if (is_subclass_of($newObj, AbstractJsonSerializable::getAbstractJsonSerializableClass())) {
-                $method = $reflect->getMethod('jsonWakeup');
-                $method->setAccessible(true);
-                $method->invoke($newObj);
+            if (method_exists($obj, '__wakeup')) {
+                $obj->__wakeup();
             }
         }
-        return $newObj;
+        return $obj;
     }
 
     /**
@@ -164,12 +182,8 @@ abstract class AbstractJsonSerializeObjData
      *
      * @return bool|string  false if prop not found
      */
-    protected static function getClassFromArray($array)
+    final protected static function getClassFromArray($array)
     {
-        if (isset($array[self::CLASS_KEY_FOR_JSON_SERIALIZE])) {
-            return $array[self::CLASS_KEY_FOR_JSON_SERIALIZE];
-        } else {
-            return false;
-        }
+        return (isset($array[self::CLASS_KEY_FOR_JSON_SERIALIZE]) ? $array[self::CLASS_KEY_FOR_JSON_SERIALIZE] : false);
     }
 }

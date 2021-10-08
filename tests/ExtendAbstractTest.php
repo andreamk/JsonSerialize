@@ -30,7 +30,6 @@ final class ExtendAbstractTest extends TestCase
 
         $obj = new ExampleClassExtendAbstractJsonSerializable(5, 10);
         $serializedValue = json_encode($obj, JSON_PRETTY_PRINT);
-        echo $serializedValue;
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
 
         $this->assertEquals($obj, $unserializedValue, 'Test class with jsonSleep and jsonWakeup');

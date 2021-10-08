@@ -39,16 +39,13 @@ class ExampleClassExtendAbstractJsonSerializable extends AbstractJsonSerializabl
     }
 
     /**
-     * This method is similar to the magic __sleep method but instead of returning
-     * the list of properties to include it returns the list of properties to exclude
+     * Function calle before serialize or json serialize
      *
-     * @link https://www.php.net/manual/en/language.oop5.magic.php#object.sleep
-     *
-     * @return string[]
+     * @return string
      */
-    protected function jsonSleep()
+    public function __sleep()
     {
-        return ['protectedProp'];
+        return ['a', 'b'];
     }
 
     /**
@@ -59,7 +56,7 @@ class ExampleClassExtendAbstractJsonSerializable extends AbstractJsonSerializabl
      *
      * @return void
      */
-    protected function jsonWakeup()
+    public function __wakeup()
     {
         $this->protectedProp = $this->a + $this->b;
     }
