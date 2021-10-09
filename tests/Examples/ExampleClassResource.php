@@ -8,13 +8,12 @@
 
 namespace Amk\JsonSerialize\Tests\Examples;
 
-use Amk\JsonSerialize\AbstractJsonSerializable;
 use Exception;
 
 /**
  * Example class with open resource on __construct and __wakeup functions
  */
-class ExampleClassResource extends AbstractJsonSerializable
+class ExampleClassResource extends \Amk\JsonSerialize\AbstractJsonSerializable
 {
     /** @var string */
     protected $path = '';
