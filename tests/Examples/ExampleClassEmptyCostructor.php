@@ -8,7 +8,6 @@
 
 namespace Amk\JsonSerialize\Tests\Examples;
 
-use Amk\JsonSerialize\AbstractJsonSerializable;
 use stdClass;
 
 /**

@@ -8,13 +8,10 @@
 
 namespace Amk\JsonSerialize\Tests\Examples;
 
-use Amk\JsonSerialize\AbstractJsonSerializable;
-use stdClass;
-
 /**
  * Example class
  */
-class ExampleClassExtendAbstractJsonSerializable extends AbstractJsonSerializable
+class ExampleClassExtendAbstractJsonSerializable extends \Amk\JsonSerialize\AbstractJsonSerializable
 {
     /** @var int */
     protected $protectedProp = null;
