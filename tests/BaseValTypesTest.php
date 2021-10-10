@@ -6,8 +6,6 @@
  * @package Amk\JsonSerialize
  */
 
-declare(strict_types=1);
-
 namespace Amk\JsonSerialize\Tests;
 
 use Amk\JsonSerialize\JsonSerialize;
