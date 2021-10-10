@@ -1,10 +1,14 @@
 # JsonSerialize
 
+![PSR12 checks](https://github.com/andreamk/JsonSerialize/actions/workflows/phpcs.yml/badge.svg) ![PHPUnit checks](https://github.com/andreamk/JsonSerialize/actions/workflows/phpunit.yml/badge.svg) 
+
 This library combines the features of the native PHP serialization with the JSON portability, in particular it allows to encode with JSON also **protected and private properties** of an object.
 When defined in classes, the magic methods [__sleep](https://www.php.net/manual/en/language.oop5.magic.php#object.sleep) and [__wakeup](https://www.php.net/manual/en/language.oop5.magic.php#object.wakeup) are used in the same way as they are used in serialization.
 
 Values serialized and unserialized with this library retain their type, so arrays, associative arrays, and objects will retain their type and class.
 
+### Requirements
+PHP 5.4+
 ## Basic usage
 
 ```PHP

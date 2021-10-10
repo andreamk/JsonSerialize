@@ -1,4 +1,4 @@
-name: PHP Code Sniffer
+name: PSR12 code
 
 on: [push, pull_request]
 
