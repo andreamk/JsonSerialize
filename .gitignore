@@ -350,3 +350,6 @@ MigrationBackup/
 .ionide/
 
 /vendor/
+
+composer.lock
+.vscode/
