@@ -6,8 +6,6 @@
  * @package Amk\JsonSerialize
  */
 
-declare(strict_types=1);
-
 namespace Amk\JsonSerialize\Tests;
 
 use Amk\JsonSerialize\JsonSerialize;
@@ -96,7 +94,7 @@ final class ExtendClassesTest extends TestCase
         $serializedValue = json_encode($list, JSON_PRETTY_PRINT);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
 
-        $this->assertIsArray($unserializedValue);
+        $this->assertEquals(is_array($unserializedValue), true, "check if resource after unserilized object is array");
         $this->assertEquals($numElements, count($unserializedValue), "check if resource after unserilized object is initialized");
 
         for ($i = 0; $i < $numElements; $i++) {
