@@ -54,11 +54,30 @@ Amk/JsonSerialize unserialize functions checks for the presence of a function wi
 
 The intended use of __wakeup() is to reestablish any database connections that may have been lost during serialization and perform other reinitialization tasks. 
 
+
+### Method __serialize
+
+```PHP
+public __serialize(): array
+```
+
+Amk/JsonSerialize serialize functions checks if the class has a function with the magic name __serialize(). If so, that function is executed prior to any serialization. It must construct and return an associative array of key/value pairs that represent the serialized form of the object. If no array is returned a Exception will be thrown.
+
+ *Note: If both __serialize() and __sleep() are defined in the same object, only __serialize() will be called. __sleep() will be ignored.*
+
+### Method __unserialize
+
+```PHP
+public __unserialize(array $data): void
+```
+Amk/JsonSerialize unserialize functions checks for the presence of a function with the magic name __unserialize(). If present, this function will be passed the restored array that was returned from __serialize(). It may then restore the properties of the object from that array as appropriate.
+
+*Note: If both __unserialize() and __wakeup() are defined in the same object, only __unserialize() will be called. __wakeup() will be ignored.*
+
 ### AbstractJsonSerializable class
 
 ```PHP
 class MyClass extends \Amk\JsonSerialize\AbstractJsonSerializable {
-
 }
 
 $obj  = new MyClass();

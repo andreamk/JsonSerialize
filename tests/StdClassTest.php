@@ -17,7 +17,6 @@ use stdClass;
  */
 final class StdClassTest extends TestCase
 {
-
      /**
       * Tests for Std class
       *

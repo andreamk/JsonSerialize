@@ -10,6 +10,7 @@ namespace Amk\JsonSerialize\Tests;
 
 use Amk\JsonSerialize\JsonSerialize;
 use Amk\JsonSerialize\Tests\Examples\ExampleClassExtendAbstractJsonSerializable;
+use Amk\JsonSerialize\Tests\Examples\ExampleClassMagicSerializeUnserialize;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,7 +18,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class ExtendAbstractTest extends TestCase
 {
-
      /**
       * Tests for Extended class
       *
@@ -25,11 +25,24 @@ final class ExtendAbstractTest extends TestCase
       */
     public function testExtendedClass()
     {
-
         $obj = new ExampleClassExtendAbstractJsonSerializable(5, 10);
         $serializedValue = json_encode($obj, JSON_PRETTY_PRINT);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
 
-        $this->assertEquals($obj, $unserializedValue, 'Test class with jsonSleep and jsonWakeup');
+        $this->assertEquals($obj, $unserializedValue, 'Test class with __sleep and __wakeup');
+    }
+
+    /**
+     * Test __serialize __unserialize magic methods
+     *
+     * @return void
+     */
+    public function testMagicSerializeUnserialize()
+    {
+        $obj = new ExampleClassMagicSerializeUnserialize(5, 10);
+        $serializedValue = json_encode($obj, JSON_PRETTY_PRINT);
+        $unserializedValue = JsonSerialize::unserialize($serializedValue);
+
+        $this->assertEquals($obj, $unserializedValue, 'Test class with __serialize and __unserialize');
     }
 }
