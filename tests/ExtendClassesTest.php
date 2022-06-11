@@ -18,7 +18,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class ExtendClassesTest extends TestCase
 {
-
      /**
       * Tests for Extended class
       *

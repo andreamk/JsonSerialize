@@ -18,6 +18,7 @@ abstract class AbstractJsonSerializable extends AbstractJsonSerializeObjData imp
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     final public function jsonSerialize()
     {
         return self::objectToJsonData($this, 0, []);
