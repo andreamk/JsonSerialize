@@ -27,8 +27,8 @@ final class ExtendAbstractTest extends TestCase
     {
         $obj = new ExampleClassExtendAbstractJsonSerializable(5, 10);
         $serializedValue = json_encode($obj, JSON_PRETTY_PRINT);
+        $this->assertIsString($serializedValue);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
-
         $this->assertEquals($obj, $unserializedValue, 'Test class with __sleep and __wakeup');
     }
 
@@ -41,8 +41,8 @@ final class ExtendAbstractTest extends TestCase
     {
         $obj = new ExampleClassMagicSerializeUnserialize(5, 10);
         $serializedValue = json_encode($obj, JSON_PRETTY_PRINT);
+        $this->assertIsString($serializedValue);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
-
         $this->assertEquals($obj, $unserializedValue, 'Test class with __serialize and __unserialize');
     }
 }

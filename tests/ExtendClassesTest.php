@@ -30,11 +30,13 @@ final class ExtendClassesTest extends TestCase
         $value->initSubClass();
 
         $serializedValue = JsonSerialize::serialize($value, JSON_PRETTY_PRINT);
+        $this->assertIsString($serializedValue);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertEquals($value, $unserializedValue, 'Test class with empty costructor');
 
         $value->publicProp = 'change prop';
         $serializedValue = JsonSerialize::serialize($value, JSON_PRETTY_PRINT);
+        $this->assertIsString($serializedValue);
         $unserializedValue = new ExampleClassEmptyCostructor();
         JsonSerialize::unserializeToObj($serializedValue, $unserializedValue);
         $this->assertEquals($value, $unserializedValue, 'Test unserializeToObj with class with empty costructor');
@@ -43,6 +45,7 @@ final class ExtendClassesTest extends TestCase
             $value,
             JSON_PRETTY_PRINT | JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME
         );
+        $this->assertIsString($serializedValue);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertEquals($value->getArray(), $unserializedValue, 'Test sierialize obj with skip props and skip class name');
     }
@@ -60,9 +63,11 @@ final class ExtendClassesTest extends TestCase
             mkdir($testDir);
         } else {
             $files = glob($testDir . '/*');
-            foreach ($files as $file) {
-                if (is_file($file)) {
-                    unlink($file);
+            if (is_array($files)) {
+                foreach ($files as $file) {
+                    if (is_file($file)) {
+                        unlink($file);
+                    }
                 }
             }
         }
@@ -72,11 +77,13 @@ final class ExtendClassesTest extends TestCase
         $object->writeContent($contentString);
 
         $serializedValue = JsonSerialize::serialize($object, JSON_PRETTY_PRINT);
+        $this->assertIsString($serializedValue);
+        $object = new ExampleClassResource($testDir . '/test.txt');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
+        $this->assertInstanceOf(ExampleClassResource::class, $unserializedValue);
 
         /* content readed from file */
         $contentCheck = $unserializedValue->getContent();
-
         $this->assertEquals($contentString, $contentCheck, "check if resource after unserilized object is initialized");
 
 
@@ -91,7 +98,9 @@ final class ExtendClassesTest extends TestCase
         }
 
         $serializedValue = json_encode($list, JSON_PRETTY_PRINT);
+        $this->assertIsString($serializedValue);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
+        $this->assertIsArray($unserializedValue);
 
         $this->assertEquals(is_array($unserializedValue), true, "check if resource after unserilized object is array");
         $this->assertEquals($numElements, count($unserializedValue), "check if resource after unserilized object is initialized");

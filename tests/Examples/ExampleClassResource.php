@@ -17,8 +17,8 @@ class ExampleClassResource extends \Amk\JsonSerialize\AbstractJsonSerializable
 {
     /** @var string */
     protected $path = '';
-    /** @var resource */
-    protected $handle = null;
+    /** @var false|resource */
+    protected $handle = false;
 
     /**
      * Class costructor
@@ -60,11 +60,18 @@ class ExampleClassResource extends \Amk\JsonSerialize\AbstractJsonSerializable
      */
     public function getContent()
     {
-        if (($filesize = filesize($this->path)) == 0) {
+        if (($filesize = (int) filesize($this->path)) == 0) {
+            return '';
+        }
+        if (!$this->handle) {
             return '';
         }
         fseek($this->handle, 0);
-        return fread($this->handle, filesize($this->path));
+
+        if (($result = fread($this->handle, $filesize)) === false) {
+            return '';
+        }
+        return $result;
     }
 
     /**
@@ -76,6 +83,9 @@ class ExampleClassResource extends \Amk\JsonSerialize\AbstractJsonSerializable
      */
     public function writeContent($content)
     {
+        if (!$this->handle) {
+            return false;
+        }
 
         fseek($this->handle, 0);
         if (fwrite($this->handle, $content) === false) {

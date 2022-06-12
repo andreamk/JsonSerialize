@@ -31,6 +31,9 @@ class ExampleClassEmptyCostructor
      */
     public function __construct()
     {
+        if ($this->privateProp) {
+            $this->privateProp ++;
+        }
     }
 
     /**
@@ -51,7 +54,7 @@ class ExampleClassEmptyCostructor
     /**
      * Return object to associative array
      *
-     * @return array
+     * @return mixed[]
      */
     public function getArray()
     {

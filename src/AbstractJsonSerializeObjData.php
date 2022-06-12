@@ -28,7 +28,7 @@ abstract class AbstractJsonSerializeObjData
      * @param int      $flags      flags bitmask
      * @param string[] $objParents objs parents unique objects hash list
      *
-     * @return array
+     * @return mixed[]
      */
     final protected static function objectToJsonData($obj, $flags = 0, $objParents = [])
     {
@@ -90,12 +90,14 @@ abstract class AbstractJsonSerializeObjData
             case "NULL":
                 return $value;
             case "array":
+                /** @var mixed[] $value */
                 $result = [];
                 foreach ($value as $key => $arrayVal) {
                     $result[$key] = self::valueToJsonData($arrayVal, $flags, $objParents);
                 }
                 return $result;
             case "object":
+                /** @var object $value */
                 $objHash = spl_object_hash($value);
                 if (in_array($objHash, $objParents)) {
                     // prevent infinite recursion loop
@@ -122,6 +124,7 @@ abstract class AbstractJsonSerializeObjData
     {
         switch (gettype($value)) {
             case 'array':
+                /** @var mixed[] $value */
                 if (($newClassName = self::getClassFromArray($value)) === false) {
                     $result = [];
                     foreach ($value as $key => $arrayVal) {
@@ -151,8 +154,8 @@ abstract class AbstractJsonSerializeObjData
     /**
      * Fill passed object from array values
      *
-     * @param array  $value value from json data
-     * @param object $obj   object to fill with json data
+     * @param mixed[] $value value from json data
+     * @param object  $obj   object to fill with json data
      *
      * @return object
      */
@@ -190,12 +193,14 @@ abstract class AbstractJsonSerializeObjData
     /**
      * Return class name from array values
      *
-     * @param array $array array data
+     * @param mixed[] $array array data
      *
-     * @return bool|string  false if prop not found
+     * @return false|string  false if prop not found
      */
     final protected static function getClassFromArray($array)
     {
-        return (isset($array[self::CLASS_KEY_FOR_JSON_SERIALIZE]) ? $array[self::CLASS_KEY_FOR_JSON_SERIALIZE] : false);
+        /** @var false|string $result */
+        $result = (isset($array[self::CLASS_KEY_FOR_JSON_SERIALIZE]) ? $array[self::CLASS_KEY_FOR_JSON_SERIALIZE] : false);
+        return $result;
     }
 }

@@ -33,7 +33,7 @@ class ExampleClassMagicSerializeUnserialize extends \Amk\JsonSerialize\AbstractJ
     /**
      * Return array to serialize
      *
-     * @return array
+     * @return mixed[]
      */
     public function __serialize()
     {
@@ -46,7 +46,7 @@ class ExampleClassMagicSerializeUnserialize extends \Amk\JsonSerialize\AbstractJ
     /**
      * Unserialize data
      *
-     * @param array $data serialized data
+     * @param mixed[] $data serialized data
      *
      * @return void
      */

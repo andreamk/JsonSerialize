@@ -18,9 +18,9 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     /**
      * Return json string
      *
-     * @param mixed   $value value to serialize
-     * @param integer $flags json_encode flags
-     * @param integer $depth json_encode depth
+     * @param mixed       $value value to serialize
+     * @param int         $flags json_encode flags
+     * @param int<1, max> $depth json_encode depth
      *
      * @link https://www.php.net/manual/en/function.json-encode.php
      *
@@ -36,9 +36,9 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     /**
      * Unserialize from json
      *
-     * @param string  $json  json string
-     * @param integer $depth json_decode depth
-     * @param integer $flags json_decode flags
+     * @param string      $json  json string
+     * @param int<1, max> $depth json_decode depth
+     * @param int         $flags json_decode flags
      *
      * @link https://www.php.net/manual/en/function.json-decode.php
      *
@@ -53,10 +53,10 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     /**
      * Unserialize json on passed object
      *
-     * @param string  $json  json string
-     * @param object  $obj   object to fill
-     * @param integer $depth json_decode depth
-     * @param integer $flags json_decode flags
+     * @param string      $json  json string
+     * @param object      $obj   object to fill
+     * @param int<1, max> $depth json_decode depth
+     * @param int         $flags json_decode flags
      *
      * @link https://www.php.net/manual/en/function.json-decode.php
      *
