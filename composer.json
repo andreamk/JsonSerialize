@@ -21,9 +21,13 @@
         "composer/composer": ">=1.5.6 <1.7.0 || ^1.7.1 || ^2.0.0",
         "phpunit/phpunit": "^4 || ^6 || ^9",
         "squizlabs/php_codesniffer": "^3",
-        "phpstan/phpstan": "^1.7",
-        "phpstan/phpstan-phpunit": "^1.1",
-        "phpstan/extension-installer": "^1.1"
+        "phpstan/phpstan": "*",
+        "phpstan/phpstan-phpunit": "*",
+        "phpstan/extension-installer": "*"
+    },
+    "suggest": {
+        "monolog/monolog": "Allows more advanced logging of the application flow",
+        "ext-xml": "Needed to support XML format in class Foo"
     },
     "scripts": {
         "phpcs": "./vendor/bin/phpcs --standard=./tests/phpsniff_ruleset.xml -v .",
