@@ -12,6 +12,9 @@
     "config": {
         "platform-check": false,
         "ignore-platform-req": "php",
+        "platform":{
+            "php":"7.4"
+        },
         "allow-plugins": {
             "mcaskill/composer-exclude-files": true
         }
