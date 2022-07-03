@@ -9,6 +9,18 @@
             "Amk\\JsonSerialize\\": "src/"
         }
     },
+    "config": {
+        "platform-check": false,
+        "ignore-platform-req": "php",
+        "allow-plugins": {
+            "mcaskill/composer-exclude-files": true
+        }
+    },
+    "extra": {
+        "exclude-from-files": [
+            "phpstan/phpstan/bootstrap.php"
+        ]
+    },
     "authors": [{
         "name": "Andrea Leoni",
         "email": "a.leoni@amkdeveloper.com"
@@ -23,7 +35,8 @@
         "squizlabs/php_codesniffer": "^3",
         "phpstan/phpstan": "*",
         "phpstan/phpstan-phpunit": "*",
-        "phpstan/extension-installer": "*"
+        "phpstan/extension-installer": "*",
+        "mcaskill/composer-exclude-files": "^2.1"
     },
     "scripts": {
         "phpcs": "./vendor/bin/phpcs --standard=./tests/phpsniff_ruleset.xml -v .",
