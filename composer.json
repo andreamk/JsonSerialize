@@ -13,7 +13,8 @@
         "platform-check": false,
         "ignore-platform-req": "php",
         "allow-plugins": {
-            "mcaskill/composer-exclude-files": true
+            "mcaskill/composer-exclude-files": true,
+            "phpstan/extension-installer": true
         }
     },
     "extra": {
