@@ -28,7 +28,7 @@ jobs:
       run: php -v
 
     - name: Update composer.lock
-      run: composer update
+      run: composer update --ignore-platform-reqs
       
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
