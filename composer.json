@@ -25,10 +25,6 @@
         "phpstan/phpstan-phpunit": "*",
         "phpstan/extension-installer": "*"
     },
-    "suggest": {
-        "monolog/monolog": "Allows more advanced logging of the application flow",
-        "ext-xml": "Needed to support XML format in class Foo"
-    },
     "scripts": {
         "phpcs": "./vendor/bin/phpcs --standard=./tests/phpsniff_ruleset.xml -v .",
         "phpcbf": "./vendor/bin/phpcbf --standard=./tests/phpsniff_ruleset.xml --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 -w -v .",
