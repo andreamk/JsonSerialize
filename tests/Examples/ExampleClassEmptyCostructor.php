@@ -75,4 +75,14 @@ class ExampleClassEmptyCostructor
         $this->subExample = new self();
         $this->subExample->updateValues();
     }
+
+    /**
+     * Return class name of current class
+     *
+     * @return string
+     */
+    public static function getClass()
+    {
+        return __CLASS__;
+    }
 }

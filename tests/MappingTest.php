@@ -172,8 +172,8 @@ final class MappingTest extends TestCase
 
         $map = new JsonUnserializeMapping(
             [
-            'el1' => 'cl:' . ExampleClassEmptyCostructor::class,
-            'el2' => 'cl:' . ExampleClassEmptyCostructor::class
+            'el1' => 'cl:' . ExampleClassEmptyCostructor::getClass(),
+            'el2' => 'cl:' . ExampleClassEmptyCostructor::getClass()
             ]
         );
 
@@ -209,8 +209,8 @@ final class MappingTest extends TestCase
         $map = new JsonUnserializeMapping(
             [
             '' => 'object',
-            'list1/*' => 'cl:' . ExampleClassEmptyCostructor::class,
-            'list2/*/test' => 'cl:' . ExampleClassEmptyCostructor::class
+            'list1/*' => 'cl:' . ExampleClassEmptyCostructor::getClass(),
+            'list2/*/test' => 'cl:' . ExampleClassEmptyCostructor::getClass()
             ]
         );
 
