@@ -188,18 +188,19 @@ final class MappingTest extends TestCase
      *
      * @return void
      */
-    public function testWildCardProp() {
+    public function testWildCardProp()
+    {
         $value = new stdClass();
         $value->list1 = [];
         $value->list2 = [];
 
-        for ($i = 0; $i < 3; $i ++) {
+        for ($i = 0; $i < 3; $i++) {
             $obj = new ExampleClassEmptyCostructor();
             $obj->publicProp = 'Item NUM ' . $i;
             $value->list1[] = $obj;
         }
 
-        for ($i = 0; $i < 2; $i ++) {
+        for ($i = 0; $i < 2; $i++) {
             $obj = new ExampleClassEmptyCostructor();
             $obj->publicProp = 'Item NUM ' . $i;
             $value->list2['el_' . $i] = [ 'test' => $obj ];
