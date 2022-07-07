@@ -257,8 +257,6 @@ final class MappingTest extends TestCase
         $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
         $unserVal = JsonSerialize::unserializeWithMapping($serializedValue, $map);
 
-        var_dump($unserVal);
-
         $this->assertEquals($value, $unserVal);
     }
 }
