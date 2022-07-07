@@ -114,8 +114,8 @@ abstract class AbstractJsonSerializeObjData
     /**
      * Return value from json decoded data
      *
-     * @param mixed                   $value json decoded data
-     * @param ?JsonUnserializeMapping $map   unserialize map
+     * @param mixed               $value json decoded data
+     * @param ?JsonUnserializeMap $map   unserialize map
      *
      * @return mixed
      */
@@ -138,6 +138,9 @@ abstract class AbstractJsonSerializeObjData
                         };
                         return $result;
                     case 'object':
+                        if (!is_array($value)) {
+                            $value = [];
+                        }
                         return self::fillObjFromValue($value, $mappedVal, $map);
                     default:
                         return $mappedVal;
@@ -179,9 +182,9 @@ abstract class AbstractJsonSerializeObjData
     /**
      * Fill passed object from array values
      *
-     * @param array                   $value value from json data
-     * @param object                  $obj   object to fill with json data
-     * @param ?JsonUnserializeMapping $map   unserialize map
+     * @param array               $value value from json data
+     * @param object              $obj   object to fill with json data
+     * @param ?JsonUnserializeMap $map   unserialize map
      *
      * @return object
      */
@@ -210,11 +213,14 @@ abstract class AbstractJsonSerializeObjData
                 foreach ($reflect->getProperties() as $prop) {
                     $prop->setAccessible(true);
                     $propName = $prop->getName();
-                    if (!isset($value[$propName]) || $prop->isStatic()) {
-                        continue;
-                    }
                     if ($map !== null) {
                         $map->setCurrent($propName, $current);
+                        if (!array_key_exists($propName, $value) && $map->isMapped()) {
+                            $value[$propName] = null;
+                        }
+                    }
+                    if (!array_key_exists($propName, $value) || $prop->isStatic()) {
+                        continue;
                     }
                     $prop->setValue($obj, self::jsonDataToValue($value[$propName], $map));
                 }

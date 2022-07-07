@@ -3,12 +3,21 @@
 ![PSR12 checks](https://github.com/andreamk/JsonSerialize/actions/workflows/phpcs.yml/badge.svg) ![PHPUnit checks](https://github.com/andreamk/JsonSerialize/actions/workflows/phpunit.yml/badge.svg) 
 
 This library combines the features of the native PHP serialization with the JSON portability, in particular it allows to encode with JSON also **protected and private properties** of an object.
-When defined in classes, the magic methods [__sleep](https://www.php.net/manual/en/language.oop5.magic.php#object.sleep) and [__wakeup](https://www.php.net/manual/en/language.oop5.magic.php#object.wakeup) are used in the same way as they are used in serialization.
+When defined in classes, the magic methods [__sleep](https://www.php.net/manual/en/language.oop5.magic.php#object.sleep) , [__serialize](https://www.php.net/manual/en/language.oop5.magic.php#object.serialize), [__wakeup](https://www.php.net/manual/en/language.oop5.magic.php#object.wakeup) and [__unserialize](https://www.php.net/manual/en/language.oop5.magic.php#object.unserialize) are used in the same way as they are used in serialization.
 
 Values serialized and unserialized with this library retain their type, so arrays, associative arrays, and objects will retain their type and class.
 
 ### Requirements
 PHP 5.4+
+
+### Installation
+
+Via Composer
+
+```
+composer require andreamk/jsonserialize 
+```
+
 ## Basic usage
 
 ```PHP
@@ -142,12 +151,12 @@ $obj2 = new MyClass();
 JsonSerialize::unserializeToObj($json, $obj2);
 ```
 
-### Method unserializeWithMapping
+### Method unserializeWithMap
 
 ```PHP
-public static unserializeWithMapping(
+public static unserializeWithMap(
     string $json, 
-    JsonUnserializeMapping $map, 
+    JsonUnserializeMap $map, 
     $depth = 512, 
     $flags = 0
 ): mixed
@@ -158,14 +167,14 @@ The classic use is to force object deserialization of what would normally be an 
 In addition to nuti PHP native types there are special types in which you can indicate the class of an object and also reference another proprity for offects with recursive references
 
 ```PHP
-$map = new JsonUnserializeMapping(
+$map = new JsonUnserializeMap(
     [
         '' => 'object';
         'prop1/prop11' => 'bool',
         'prop2' => 'cl:MyClass'
     ]
 );
-$val = JsonSerialize::unserializeWithMapping($json, $map);
+$val = JsonSerialize::unserializeWithMap($json, $map);
 ```
 
 See the [Mapping section](#unserialize-mapping) for more information
@@ -173,15 +182,15 @@ See the [Mapping section](#unserialize-mapping) for more information
 
 ## Unserialize Mapping
 
-The mapping is defined through the `JsonUnserializeMapping` class.
+The mapping is defined through the `JsonUnserializeMap` class.
 It can be initialized by passing an array of items to the constructor, and the list of items can be manipulated later with the methods 
-`addMapItem`, `removeMapItem`, `resetMap`
+`addProp`, `removeProp`, `resetMap`
 
 A mapping object consists of the key (property identifier) value (property type) pair.
 **Please note that a mapping does not require the definition of all the properties of a structure but only the properties that need to be forced to a specific type**
 
 ```PHP
-$map = new JsonUnserializeMapping(
+$map = new JsonUnserializeMap(
     [
     'prop' => 'object',
     'prop/flag1' => 'int',
@@ -224,7 +233,7 @@ Some examples
 - With the special type `rf:` followed by the property identifier without a wildcard, a reference to the property is defined. This only makes sense if the property is already defined and is an object
 
 ```PHP
-$map = new JsonUnserializeMapping(
+$map = new JsonUnserializeMap(
     [
     '' => 'cl:' . MyClass::class, // root val is an istance of MyClass
     'items/*' => '?cl:' . MyItems::class, // all element of items are istances of MyItems or null
