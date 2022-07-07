@@ -239,9 +239,6 @@ notes:
 When defining a class type `cl:` it is initialized by also executing the __wakeup and unserialize methods if they exist
 When defining a reference `rf:` all child values of this object in the json are ignored and since the class is already initialized no __wakeup or __unserialie methods are executed
 
-
-```
-
 ## How works
 
 The serialize and unserialize methods work on standard JSON and can be read by any function that writes/reads json files. In particular if value is a scalar value or an array there is no difference in the result using standard functions json_encode and json_decode.
