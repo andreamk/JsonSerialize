@@ -39,9 +39,9 @@ class JsonSerialize extends AbstractJsonSerializeObjData
      * @param mixed   $value value to serialize
      * @param integer $flags JsonSerialize flags
      *
-     * @return mixed Returns a JSON encoded string on success or false on failure.
+     * @return mixed Returns values ready to be serialized
      */
-    public static function dataToSerialize($value, $flags = 0)
+    public static function serializeToData($value, $flags = 0)
     {
         return self::valueToJsonData($value, $flags);
     }
@@ -61,6 +61,25 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     {
         $publicArray = json_decode($json, true, $depth, $flags);
         return self::jsonDataToValue($publicArray);
+    }
+
+    /**
+     * Unserialize from json
+     *
+     * @param string                 $json  json string
+     * @param JsonUnserializeMapping $map   values mapping
+     * @param integer                $depth json_decode depth
+     * @param integer                $flags json_decode flags
+     *
+     * @link https://www.php.net/manual/en/function.json-decode.php
+     *
+     * @return mixed
+     */
+    public static function unserializeWithMapping($json, JsonUnserializeMapping $map, $depth = 512, $flags = 0)
+    {
+        $publicArray = json_decode($json, true, $depth, $flags);
+        $map->setCurrent('');
+        return self::jsonDataToValue($publicArray, $map);
     }
 
     /**

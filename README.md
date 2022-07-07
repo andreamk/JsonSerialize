@@ -99,6 +99,25 @@ $json = JsonSerialize::serialize(
 );
 ```
 
+### Method serializeToData
+
+```PHP
+public static serializeToData(
+    mixed $value, 
+    $flags = 0
+): mixed
+```
+
+In some circumstances, it is useful to be able to process the data structure before transforming it into JSON.
+Using the serializeToData method, you get the value that would be passed to the json_encode function with the serialize method
+
+```PHP
+$data = JsonSerialize::serializeToData($obj, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+$data['extraProp'] = true;
+unset($data['prop']);
+$json = json_encode($data);
+```
+
 ### Method unserializeToObj
 
 ```PHP
@@ -121,6 +140,106 @@ $json = JsonSerialize::serialize($obj , JsonSerialize::JSON_SERIALIZE_SKIP_CLASS
 
 $obj2 = new MyClass();
 JsonSerialize::unserializeToObj($json, $obj2);
+```
+
+### Method unserializeWithMapping
+
+```PHP
+public static unserializeWithMapping(
+    string $json, 
+    JsonUnserializeMapping $map, 
+    $depth = 512, 
+    $flags = 0
+): mixed
+```
+
+Deserialization with mapping is a very powerful method of mapping properties to change the type of in deserialization.
+The classic use is to force object deserialization of what would normally be an associative array. 
+In addition to nuti PHP native types there are special types in which you can indicate the class of an object and also reference another proprity for offects with recursive references
+
+```PHP
+$map = new JsonUnserializeMapping(
+    [
+        '' => 'object';
+        'prop1/prop11' => 'bool',
+        'prop2' => 'cl:MyClass'
+    ]
+);
+$val = JsonSerialize::unserializeWithMapping($json, $map);
+```
+
+See the [Mapping section](#unserialize-mapping) for more information
+
+
+## Unserialize Mapping
+
+The mapping is defined through the `JsonUnserializeMapping` class.
+It can be initialized by passing an array of items to the constructor, and the list of items can be manipulated later with the methods 
+`addMapItem`, `removeMapItem`, `resetMap`
+
+A mapping object consists of the key (property identifier) value (property type) pair.
+**Please note that a mapping does not require the definition of all the properties of a structure but only the properties that need to be forced to a specific type**
+
+```PHP
+$map = new JsonUnserializeMapping(
+    [
+    'prop' => 'object',
+    'prop/flag1' => 'int',
+    'prop/flag2' => 'bool'
+    ]
+);
+```
+
+### Property identifier
+
+- the empty identifier corresponds to the root element
+- Property levels are separated by the character `/`
+- The `*` character is the wildcard character, useful if you want to map all the elements of an array
+
+Some examples
+```PHP
+[
+    '' => type, // itendifies the root element
+    'prop' => type, // identifies the level 1 property ($val->prop or $val['prop'])
+    'v1/v2/v3' => type, // identifies the level 3 property ($val->v1->v2->v3 or $val['v1']['v2']['v3'])
+    'v1/*' => type, // identifies all the properties that are children of v1,
+    'v1/*/v3' => type, // identifies all v3 properties of the children of v1
+]
+```
+
+- The wildcard property but less priority than a specific property so you can define a type for all but a few properties. in the next example all child properties of element will be integers except flag which will be boolean
+
+```PHP
+[
+    'element/*' => 'int',
+    'element/flag' => 'bool',
+]
+```
+
+### Property type
+
+- The type is a string that can be a php native type `bool`, `boolean`, `float` , `int` , `integer` , `string` , `array` , `object` , `null`.
+- If the type starts with the character `?` then it can be nullable. This means that the json value is null is kept null otherwise it takes the value of the type. 
+- With the special type `cl:` followed by the class identifier, it is defined that the type is the object of the class defined
+- With the special type `rf:` followed by the property identifier without a wildcard, a reference to the property is defined. This only makes sense if the property is already defined and is an object
+
+```PHP
+$map = new JsonUnserializeMapping(
+    [
+    '' => 'cl:' . MyClass::class, // root val is an istance of MyClass
+    'items/*' => '?cl:' . MyItems::class, // all element of items are istances of MyItems or null
+    'items/*/parent' => 'rf:', // all prop parent of all items ar a reference to root value
+    'obj' => '?object' // obj can be null or an object
+    ]
+);
+
+```
+
+notes:
+When defining a class type `cl:` it is initialized by also executing the __wakeup and unserialize methods if they exist
+When defining a reference `rf:` all child values of this object in the json are ignored and since the class is already initialized no __wakeup or __unserialie methods are executed
+
+
 ```
 
 ## How works
