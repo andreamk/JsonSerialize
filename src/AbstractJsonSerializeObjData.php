@@ -123,22 +123,25 @@ abstract class AbstractJsonSerializeObjData
     {
         if ($map !== null) {
             $current = $map->getCurrent();
-        }
 
-        if (!is_null($map) && $map->isMapped()) {
-            $mappedVal = $map->getMappedValue($value);
-            switch (gettype($mappedVal)) {
-                case 'array':
-                    $result = [];
-                    foreach ($mappedVal as $key => $arrayVal) {
-                        $map->setCurrent($key, $current);
-                        $result[$key] = self::jsonDataToValue($arrayVal, $map);
-                    };
-                    return $result;
-                case 'object':
-                    return self::fillObjFromValue($value, $mappedVal, $map);
-                default:
+            if ($map->isMapped()) {
+                $mappedVal = $map->getMappedValue($value, $isReference);
+                if ($isReference) {
                     return $mappedVal;
+                }
+                switch (gettype($mappedVal)) {
+                    case 'array':
+                        $result = [];
+                        foreach ($mappedVal as $key => $arrayVal) {
+                            $map->setCurrent($key, $current);
+                            $result[$key] = self::jsonDataToValue($arrayVal, $map);
+                        };
+                        return $result;
+                    case 'object':
+                        return self::fillObjFromValue($value, $mappedVal, $map);
+                    default:
+                        return $mappedVal;
+                }
             }
         }
 
@@ -186,6 +189,7 @@ abstract class AbstractJsonSerializeObjData
     {
         if ($map !== null) {
             $current = $map->getCurrent();
+            $map->addReferenceObjOfCurrent($obj);
         }
 
         if ($obj instanceof \stdClass) {

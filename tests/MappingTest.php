@@ -219,4 +219,46 @@ final class MappingTest extends TestCase
 
         $this->assertEquals($value, $unserVal);
     }
+
+    /**
+     * Test reference object
+     *
+     * @return void
+     */
+    public function testReference()
+    {
+        $value = new stdClass();
+
+        $value->list = [
+            'a' => new stdClass(),
+            'b' => 2,
+            'c' => new stdClass()
+        ];
+
+        $value->list['c']->value = $value;
+        $value->list['c']->item = 'item';
+        $value->list['c']->array = [
+            $value->list['a'],
+            $value->list['a'],
+            $value->list['a']
+        ];
+
+
+        $map = new JsonUnserializeMapping(
+            [
+            '' => 'object',
+            'list/a' => 'object',
+            'list/c' => 'object',
+            'list/c/value' => 'rf:',
+            'list/c/array/*' => 'rf:list/a'
+            ]
+        );
+
+        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $unserVal = JsonSerialize::unserializeWithMapping($serializedValue, $map);
+
+        var_dump($unserVal);
+
+        $this->assertEquals($value, $unserVal);
+    }
 }

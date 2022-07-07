@@ -41,6 +41,8 @@ class JsonUnserializeMapping
     private $isCurrentMapped = false;
     /** @var mixed */
     private $currentType = null;
+    /** @var object[] */
+    private $objReferences = [];
 
     /**
      * Class constructor
@@ -69,6 +71,19 @@ class JsonUnserializeMapping
         $this->currentProp = '';
         $this->isCurrentMapped = false;
         $this->currentType = null;
+        $this->objReferences = [];
+    }
+
+    /**
+     * Add reference object
+     *
+     * @param object $obj object
+     *
+     * @return void
+     */
+    public function addReferenceObjOfCurrent($obj)
+    {
+        $this->objReferences[$this->currentProp] = $obj;
     }
 
     /**
@@ -139,11 +154,12 @@ class JsonUnserializeMapping
     /**
      * Return mapped value
      *
-     * @param mixed $value input value
+     * @param mixed $value       input value
+     * @param bool  $isReference Set to true if is reference object
      *
      * @return mixed
      */
-    public function getMappedValue($value)
+    public function getMappedValue($value, &$isReference = false)
     {
         if (!$this->isCurrentMapped) {
             return $value;
@@ -168,8 +184,13 @@ class JsonUnserializeMapping
                 }
                 return $newObj;
             case 'rf:':
-                /** @todo prop reference */
-                break;
+                $reference = substr($type, 3);
+                $isReference = true;
+                if (isset($this->objReferences[$reference])) {
+                    return $this->objReferences[$reference];
+                } else {
+                    return null;
+                }
         }
 
         switch ($type) {
@@ -192,6 +213,9 @@ class JsonUnserializeMapping
             default:
                 break;
         }
+
+        /** @todo create flag not strict to return false */
+        throw new Exception('Invalid mapping');
     }
 
     /**

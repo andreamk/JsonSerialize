@@ -1,5 +1,16 @@
 {
     "phpSniffer.standard": "./tests/phpsniff_ruleset.xml",
     "phpSniffer.autoDetect": true,
-    "phpcs.standard": "./tests/phpsniff_ruleset.xml"
+    "phpcs.standard": "./tests/phpsniff_ruleset.xml",
+    "phpcs.autoConfigSearch": true,
+    "saveAndRun": {
+        "commands": [
+            {
+                "match": "^(?!.*\\\/[Vv]endor\\\/).*\\.php$",
+                "cmd": "phpcbf -q --standard=${workspaceFolder}/tests/phpsniff_ruleset.xml ${fileDirname}/${fileBasename}",
+                "useShortcut": false,
+                "silent": true
+            }
+        ]
+    }
 }
