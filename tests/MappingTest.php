@@ -9,8 +9,10 @@
 namespace Amk\JsonSerialize\Tests;
 
 use Amk\JsonSerialize\JsonSerialize;
-use Amk\JsonSerialize\JsonUnserializeMapping;
+use Amk\JsonSerialize\JsonUnserializeMap;
 use Amk\JsonSerialize\Tests\Examples\ExampleClassEmptyCostructor;
+use Amk\JsonSerialize\Tests\Examples\ExampleMapping;
+use Amk\JsonSerialize\Tests\Examples\ExampleMappingSub;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -53,7 +55,7 @@ final class MappingTest extends TestCase
         $obj->nullVal->toFloat = null;
         $obj->nullVal->notMapperd = null;
 
-        $map = new JsonUnserializeMapping(
+        $map = new JsonUnserializeMap(
             [
             '' => 'object',
             'intVals' => 'object',
@@ -78,7 +80,7 @@ final class MappingTest extends TestCase
 
         $value  = $obj;
         $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
-        $unserObj = JsonSerialize::unserializeWithMapping($serializedValue, $map);
+        $unserObj = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertSame(is_object($unserObj), true, 'isn\'t object');
         $this->assertSame(is_object($unserObj->intVals), true, 'isn\'t object');
@@ -133,7 +135,7 @@ final class MappingTest extends TestCase
             'null'  => null
         ];
 
-        $map = new JsonUnserializeMapping(
+        $map = new JsonUnserializeMap(
             [
             '' => 'object',
             'intVals/notNull' => '?int',
@@ -149,7 +151,7 @@ final class MappingTest extends TestCase
 
         $value  = $obj;
         $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
-        $unserObj = JsonSerialize::unserializeWithMapping($serializedValue, $map);
+        $unserObj = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($obj, $unserObj);
     }
@@ -170,7 +172,7 @@ final class MappingTest extends TestCase
         $obj->publicProp = 'Second item';
         $value['el2'] = $obj;
 
-        $map = new JsonUnserializeMapping(
+        $map = new JsonUnserializeMap(
             [
             'el1' => 'cl:' . ExampleClassEmptyCostructor::getClass(),
             'el2' => 'cl:' . ExampleClassEmptyCostructor::getClass()
@@ -178,7 +180,7 @@ final class MappingTest extends TestCase
         );
 
         $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
-        $unserVal = JsonSerialize::unserializeWithMapping($serializedValue, $map);
+        $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
     }
@@ -206,7 +208,7 @@ final class MappingTest extends TestCase
             $value->list2['el_' . $i] = [ 'test' => $obj ];
         }
 
-        $map = new JsonUnserializeMapping(
+        $map = new JsonUnserializeMap(
             [
             '' => 'object',
             'list1/*' => 'cl:' . ExampleClassEmptyCostructor::getClass(),
@@ -215,7 +217,7 @@ final class MappingTest extends TestCase
         );
 
         $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
-        $unserVal = JsonSerialize::unserializeWithMapping($serializedValue, $map);
+        $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
     }
@@ -244,7 +246,7 @@ final class MappingTest extends TestCase
         ];
 
 
-        $map = new JsonUnserializeMapping(
+        $map = new JsonUnserializeMap(
             [
             '' => 'object',
             'list/a' => 'object',
@@ -255,7 +257,32 @@ final class MappingTest extends TestCase
         );
 
         $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
-        $unserVal = JsonSerialize::unserializeWithMapping($serializedValue, $map);
+        $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
+
+        $this->assertEquals($value, $unserVal);
+    }
+
+    /**
+     * Test mapping with null props
+     *
+     * @return void
+     */
+    public function testNullProps()
+    {
+        $value = new ExampleMapping();
+
+        $map = new JsonUnserializeMap(
+            [
+            '' => 'cl:' . ExampleMapping::getClass(),
+            'child' => 'cl:' . ExampleMappingSub::getClass(),
+            'child/parent' => 'rf:',
+            'child2' => 'cl:' . ExampleMappingSub::getClass(),
+            'child2/parent' => 'rf:'
+            ]
+        );
+
+        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
     }

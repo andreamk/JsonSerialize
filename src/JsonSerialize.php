@@ -66,16 +66,16 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     /**
      * Unserialize from json
      *
-     * @param string                 $json  json string
-     * @param JsonUnserializeMapping $map   values mapping
-     * @param integer                $depth json_decode depth
-     * @param integer                $flags json_decode flags
+     * @param string             $json  json string
+     * @param JsonUnserializeMap $map   values mapping
+     * @param integer            $depth json_decode depth
+     * @param integer            $flags json_decode flags
      *
      * @link https://www.php.net/manual/en/function.json-decode.php
      *
      * @return mixed
      */
-    public static function unserializeWithMapping($json, JsonUnserializeMapping $map, $depth = 512, $flags = 0)
+    public static function unserializeWithMap($json, JsonUnserializeMap $map, $depth = 512, $flags = 0)
     {
         $publicArray = json_decode($json, true, $depth, $flags);
         $map->setCurrent('');

@@ -31,7 +31,7 @@ use ReflectionClass;
  *
  * If type start with ? is nullable
  */
-class JsonUnserializeMapping
+class JsonUnserializeMap
 {
     /** @var MapItem */
     private $map = null;
@@ -57,12 +57,12 @@ class JsonUnserializeMapping
         $this->map = new MapItem();
 
         foreach ($map as $prop => $type) {
-            $this->addMapItem($prop, $type);
+            $this->addProp($prop, $type);
         }
     }
 
     /**
-     * Reset current prop
+     * Reset current property
      *
      * @return void
      */
@@ -107,10 +107,10 @@ class JsonUnserializeMapping
     }
 
     /**
-     * Set current prop
+     * Set current property
      *
-     * @param string $prop   prop name
-     * @param string $parent prop parent
+     * @param string $prop   property name
+     * @param string $parent property parent
      *
      * @return bool return true if current prop is mapped
      */
@@ -219,14 +219,14 @@ class JsonUnserializeMapping
     }
 
     /**
-     * Add map element
+     * Add map property
      *
-     * @param string $prop prop itendifier, if exists overite it
-     * @param string $type type to map
+     * @param string $prop property itendifier, if exists overite it
+     * @param string $type value type
      *
      * @return void
      */
-    public function addMapItem($prop, $type)
+    public function addProp($prop, $type)
     {
         $cLevel = $this->map;
         if (strlen($prop) > 0) {
@@ -243,13 +243,13 @@ class JsonUnserializeMapping
     }
 
     /**
-     * Add map element
+     * Remove map property
      *
-     * @param string $prop prop itendifier
+     * @param string $prop property itendifier
      *
      * @return void
      */
-    public function removeMapItem($prop)
+    public function removeProp($prop)
     {
         if (isset($this->map[$prop])) {
             unset($this->map[$prop]);
@@ -257,7 +257,7 @@ class JsonUnserializeMapping
     }
 
     /**
-     * Remove all map items
+     * Remove all map properties
      *
      * @return void
      */
