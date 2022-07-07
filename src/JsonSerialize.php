@@ -39,9 +39,9 @@ class JsonSerialize extends AbstractJsonSerializeObjData
      * @param mixed   $value value to serialize
      * @param integer $flags JsonSerialize flags
      *
-     * @return mixed Returns a JSON encoded string on success or false on failure.
+     * @return mixed Returns values ready to be serialized
      */
-    public static function dataToSerialize($value, $flags = 0)
+    public static function serializeToData($value, $flags = 0)
     {
         return self::valueToJsonData($value, $flags);
     }
