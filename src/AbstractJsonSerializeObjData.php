@@ -11,6 +11,7 @@ namespace Amk\JsonSerialize;
 use Exception;
 use ReflectionClass;
 use ReflectionObject;
+use stdClass;
 
 /**
  * This calsse contains the logic that converts objects into values ready to be encoded in json
@@ -243,5 +244,130 @@ abstract class AbstractJsonSerializeObjData
     final protected static function getClassFromArray($array)
     {
         return (isset($array[self::CLASS_KEY_FOR_JSON_SERIALIZE]) ? $array[self::CLASS_KEY_FOR_JSON_SERIALIZE] : false);
+    }
+
+    /**
+     * Perform sanity checks on data that shall be encoded to JSON.
+     *
+     * @param mixed $data  Variable (usually an array or object) to encode as JSON.
+     * @param int   $depth Maximum depth to walk through $data. Must be greater than 0.
+     *
+     * @return mixed The sanitized data that shall be encoded to JSON.
+     *
+     * @throws Exception If depth limit is reached.
+     */
+    public static function sanitizeData($data, $depth)
+    {
+        if ($depth < 0) {
+            throw new Exception('Reached depth limit');
+        }
+
+        if (is_array($data)) {
+            $output = array();
+            foreach ($data as $id => $el) {
+                // Don't forget to sanitize the ID!
+                if (is_string($id)) {
+                    $clean_id = self::convertString($id);
+                } else {
+                    $clean_id = $id;
+                }
+
+                // Check the element type, so that we're only recursing if we really have to.
+                if (is_array($el) || is_object($el)) {
+                    $output[ $clean_id ] = self::sanitizeData($el, $depth - 1);
+                } elseif (is_string($el)) {
+                    $output[ $clean_id ] = self::convertString($el);
+                } else {
+                    $output[ $clean_id ] = $el;
+                }
+            }
+        } elseif (is_object($data)) {
+            $output = new stdClass();
+            foreach ($data as $id => $el) {
+                if (is_string($id)) {
+                    $clean_id = self::convertString($id);
+                } else {
+                    $clean_id = $id;
+                }
+
+                if (is_array($el) || is_object($el)) {
+                    $output->$clean_id = self::sanitizeData($el, $depth - 1);
+                } elseif (is_string($el)) {
+                    $output->$clean_id = self::convertString($el);
+                } else {
+                    $output->$clean_id = $el;
+                }
+            }
+        } elseif (is_string($data)) {
+            return self::convertString($data);
+        } else {
+            return $data;
+        }
+
+        return $output;
+    }
+
+    /**
+     * Convert a string to UTF-8, so that it can be safely encoded to JSON.
+     *
+     * @param string $string The string which is to be converted.
+     *
+     * @return string The checked string.
+     */
+    protected static function convertString($string)
+    {
+        static $use_mb = null;
+        if (is_null($use_mb)) {
+            $use_mb = function_exists('mb_convert_encoding');
+        }
+
+        if ($use_mb) {
+            $encoding = mb_detect_encoding($string, mb_detect_order(), true);
+            if ($encoding) {
+                return mb_convert_encoding($string, 'UTF-8', $encoding);
+            } else {
+                return mb_convert_encoding($string, 'UTF-8', 'UTF-8');
+            }
+        } else {
+            return self::checkInvalidUtf8($string, true);
+        }
+    }
+
+    /**
+     * Checks for invalid UTF8 in a string.
+     *
+     * @param string $string The text which is to be checked.
+     * @param bool   $strip  Optional. Whether to attempt to strip out invalid UTF8. Default false.
+     *
+     * @return string The checked text.
+     */
+    protected static function checkInvalidUtf8($string, $strip = false)
+    {
+        $string = (string) $string;
+        if (0 === strlen($string)) {
+            return '';
+        }
+
+        // Check for support for utf8 in the installed PCRE library once and store the result in a static.
+        static $utf8_pcre = null;
+        if (!isset($utf8_pcre)) {
+            $utf8_pcre = @preg_match('/^./u', 'a');
+        }
+
+        // We can't demand utf8 in the PCRE installation, so just return the string in those cases.
+        if (!$utf8_pcre) {
+            return $string;
+        }
+
+        if (1 === @preg_match('/^./us', $string)) {
+            return $string;
+        }
+
+        // Attempt to strip the bad chars if requested (not recommended).
+        if ($strip && function_exists('iconv')) {
+            return iconv('utf-8', 'utf-8', $string);
+        }
+
+        return '';
     }
 }

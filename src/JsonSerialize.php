@@ -28,9 +28,25 @@ class JsonSerialize extends AbstractJsonSerializeObjData
      */
     public static function serialize($value, $flags = 0, $depth = 512)
     {
+        $jsonData = self::valueToJsonData($value, $flags);
+        $json = version_compare(PHP_VERSION, '5.5', '>=') ?
+            json_encode($jsonData, $flags, $depth) :
+            json_encode($jsonData, $flags);
+
+        // If json_encode() was successful, no need to do more sanity checking.
+        if (false !== $json) {
+            return $json;
+        }
+
+        try {
+            $jsonData = self::sanitizeData($jsonData, $depth);
+        } catch (Exception $e) {
+            return false;
+        }
+
         return version_compare(PHP_VERSION, '5.5', '>=') ?
-            json_encode(self::valueToJsonData($value, $flags), $flags, $depth) :
-            json_encode(self::valueToJsonData($value, $flags), $flags);
+            json_encode($jsonData, $flags, $depth) :
+            json_encode($jsonData, $flags);
     }
 
     /**
