@@ -43,7 +43,7 @@ final class ExtendClassesTest extends TestCase
 
         $serializedValue = JsonSerialize::serialize(
             $value,
-            JSON_PRETTY_PRINT | JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME
+            JSON_PRETTY_PRINT | JsonSerialize::JSON_SKIP_CLASS_NAME
         );
         $this->assertIsString($serializedValue);
         $unserializedValue = JsonSerialize::unserialize($serializedValue);

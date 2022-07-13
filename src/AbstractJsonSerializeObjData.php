@@ -11,6 +11,7 @@ namespace Amk\JsonSerialize;
 use Exception;
 use ReflectionClass;
 use ReflectionObject;
+use stdClass;
 
 /**
  * This calsse contains the logic that converts objects into values ready to be encoded in json
@@ -18,7 +19,8 @@ use ReflectionObject;
 abstract class AbstractJsonSerializeObjData
 {
     const CLASS_KEY_FOR_JSON_SERIALIZE = 'CL_-=_-=';
-    const JSON_SERIALIZE_SKIP_CLASS_NAME = 1073741824; // 30 bit mask
+    const JSON_SKIP_CLASS_NAME = 0b01000000000000000000000000000000; // 30 bit mask
+    const JSON_SKIP_SANITIZE   = 0b10000000000000000000000000000000; // 31 bit mask
 
     /**
      * Convert object to array with private and protected proprieties.
@@ -35,7 +37,7 @@ abstract class AbstractJsonSerializeObjData
         $reflect = new ReflectionObject($obj);
         $result = [];
 
-        if (!($flags & self::JSON_SERIALIZE_SKIP_CLASS_NAME)) {
+        if (!($flags & self::JSON_SKIP_CLASS_NAME)) {
             $result[self::CLASS_KEY_FOR_JSON_SERIALIZE] = $reflect->name;
         }
 
@@ -116,28 +118,53 @@ abstract class AbstractJsonSerializeObjData
     /**
      * Return value from json decoded data
      *
-     * @param mixed $value json decoded data
+     * @param mixed               $value json decoded data
+     * @param ?JsonUnserializeMap $map   unserialize map
      *
      * @return mixed
      */
-    final protected static function jsonDataToValue($value)
+    final protected static function jsonDataToValue($value, $map = null)
     {
+        if ($map !== null) {
+            $current = $map->getCurrent();
+
+            if ($map->isMapped()) {
+                $mappedVal = $map->getMappedValue($value, $isReference);
+                if ($isReference) {
+                    return $mappedVal;
+                }
+                switch (gettype($mappedVal)) {
+                    case 'array':
+                        $result = [];
+                        foreach ($mappedVal as $key => $arrayVal) {
+                            $map->setCurrent($key, $current);
+                            $result[$key] = self::jsonDataToValue($arrayVal, $map);
+                        };
+                        return $result;
+                    case 'object':
+                        if (!is_array($value)) {
+                            $value = [];
+                        }
+                        return self::fillObjFromValue($value, $mappedVal, $map);
+                    default:
+                        return $mappedVal;
+                }
+            }
+        }
+
         switch (gettype($value)) {
             case 'array':
                 /** @var mixed[] $value */
                 if (($newClassName = self::getClassFromArray($value)) === false) {
                     $result = [];
                     foreach ($value as $key => $arrayVal) {
-                        $result[$key] = self::jsonDataToValue($arrayVal);
+                        if ($map !== null) {
+                            $map->setCurrent($key, $current);
+                        }
+                        $result[$key] = self::jsonDataToValue($arrayVal, $map);
                     }
                 } else {
-                    if (class_exists($newClassName)) {
-                        $classReflect = new ReflectionClass($newClassName);
-                        $newObj = $classReflect->newInstanceWithoutConstructor();
-                    } else {
-                        $newObj = new \StdClass();
-                    }
-                    $result = self::fillObjFromValue($value, $newObj);
+                    $result = self::fillObjFromValue($value, self::getObjFromClass($newClassName), $map);
                 }
                 return $result;
             case 'boolean':
@@ -152,21 +179,48 @@ abstract class AbstractJsonSerializeObjData
     }
 
     /**
-     * Fill passed object from array values
+     * Get object from class name, if class don't exists return StdClass.
+     * the object is intialized without call the constructor.
      *
-     * @param mixed[] $value value from json data
-     * @param object  $obj   object to fill with json data
+     * @param string $class class name
      *
      * @return object
      */
-    final protected static function fillObjFromValue($value, $obj)
+    final public static function getObjFromClass($class)
     {
+        if (class_exists($class)) {
+            $classReflect = new ReflectionClass($class);
+            return $classReflect->newInstanceWithoutConstructor();
+        } else {
+            return new \StdClass();
+        }
+    }
+
+    /**
+     * Fill passed object from array values
+     *
+     * @param mixed[]             $value value from json data
+     * @param object              $obj   object to fill with json data
+     * @param ?JsonUnserializeMap $map   unserialize map
+     *
+     * @return object
+     */
+    final protected static function fillObjFromValue($value, $obj, $map = null)
+    {
+        if ($map !== null) {
+            $current = $map->getCurrent();
+            $map->addReferenceObjOfCurrent($obj);
+        }
+
         if ($obj instanceof \stdClass) {
             foreach ($value as $arrayProp => $arrayValue) {
                 if ($arrayProp == self::CLASS_KEY_FOR_JSON_SERIALIZE) {
                     continue;
                 }
-                $obj->{$arrayProp} = self::jsonDataToValue($arrayValue);
+                if ($map !== null) {
+                    $map->setCurrent($arrayProp, $current);
+                }
+                $obj->{$arrayProp} = self::jsonDataToValue($arrayValue, $map);
             }
         } else {
             if (method_exists($obj, '__unserialize')) {
@@ -176,10 +230,16 @@ abstract class AbstractJsonSerializeObjData
                 foreach ($reflect->getProperties() as $prop) {
                     $prop->setAccessible(true);
                     $propName = $prop->getName();
-                    if (!isset($value[$propName]) || $prop->isStatic()) {
+                    if ($map !== null) {
+                        $map->setCurrent($propName, $current);
+                        if (!array_key_exists($propName, $value) && $map->isMapped()) {
+                            $value[$propName] = null;
+                        }
+                    }
+                    if (!array_key_exists($propName, $value) || $prop->isStatic()) {
                         continue;
                     }
-                    $prop->setValue($obj, self::jsonDataToValue($value[$propName]));
+                    $prop->setValue($obj, self::jsonDataToValue($value[$propName], $map));
                 }
 
                 if (method_exists($obj, '__wakeup')) {

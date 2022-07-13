@@ -3,12 +3,21 @@
 ![PSR12 checks](https://github.com/andreamk/JsonSerialize/actions/workflows/phpcs.yml/badge.svg) ![PHPUnit checks](https://github.com/andreamk/JsonSerialize/actions/workflows/phpunit.yml/badge.svg) 
 
 This library combines the features of the native PHP serialization with the JSON portability, in particular it allows to encode with JSON also **protected and private properties** of an object.
-When defined in classes, the magic methods [__sleep](https://www.php.net/manual/en/language.oop5.magic.php#object.sleep) and [__wakeup](https://www.php.net/manual/en/language.oop5.magic.php#object.wakeup) are used in the same way as they are used in serialization.
+When defined in classes, the magic methods [__sleep](https://www.php.net/manual/en/language.oop5.magic.php#object.sleep) , [__serialize](https://www.php.net/manual/en/language.oop5.magic.php#object.serialize), [__wakeup](https://www.php.net/manual/en/language.oop5.magic.php#object.wakeup) and [__unserialize](https://www.php.net/manual/en/language.oop5.magic.php#object.unserialize) are used in the same way as they are used in serialization.
 
 Values serialized and unserialized with this library retain their type, so arrays, associative arrays, and objects will retain their type and class.
 
 ### Requirements
 PHP 5.4+
+
+### Installation
+
+Via Composer
+
+```
+composer require andreamk/jsonserialize 
+```
+
 ## Basic usage
 
 ```PHP
@@ -85,18 +94,37 @@ $json = json_encode($obj);
 ```
 Extending the **AbstractJsonSerializable** class that implements the [JsonSerializable interface](https://www.php.net/manual/en/class.jsonserializable.php) allows to use the normal json_encode function of PHP obtaining for the object that extends this class the same result that you would get using *JsonSerialize::serialize*
 
-### Flag JSON_SERIALIZE_SKIP_CLASS_NAME
+### Flag JSON_SKIP_CLASS_NAME
 
 In some circumstances it can be useful to serialize an object in JSON without exposing the class. For example if we want to send the contents of an object to a browser via an AJAX call.
-In these cases we can use the JSON_SERIALIZE_SKIP_CLASS_NAME flag in addition to the normal flags of the json_encode function.
+In these cases we can use the JSON_SKIP_CLASS_NAME flag in addition to the normal flags of the json_encode function.
 
 ```PHP
 use Amk\JsonSerialize\JsonSerialize;
 
 $json = JsonSerialize::serialize(
     $value,
-    JSON_PRETTY_PRINT | JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME
+    JSON_PRETTY_PRINT | JsonSerialize::JSON_SKIP_CLASS_NAME
 );
+```
+
+### Method serializeToData
+
+```PHP
+public static serializeToData(
+    mixed $value, 
+    $flags = 0
+): mixed
+```
+
+In some circumstances, it is useful to be able to process the data structure before transforming it into JSON.
+Using the serializeToData method, you get the value that would be passed to the json_encode function with the serialize method
+
+```PHP
+$data = JsonSerialize::serializeToData($obj, JsonSerialize::JSON_SKIP_CLASS_NAME);
+$data['extraProp'] = true;
+unset($data['prop']);
+$json = json_encode($data);
 ```
 
 ### Method unserializeToObj
@@ -104,24 +132,121 @@ $json = JsonSerialize::serialize(
 ```PHP
 public static JsonSerialize::unserializeToObj(
     string $json, 
-    object $obj, 
-    $depth = 512, 
-    $flags = 0
+    object|string $obj, 
+    int $depth = 512, 
+    int $flags = 0
 ) : object
 ```
 
-In some circumstances it may be useful to unserialize JSON data in an already instantiated object. For example if we are working on a serialized JSON with the JSON_SERIALIZE_SKIP_CLASS_NAME flag.
+In some circumstances it may be useful to unserialize JSON data in an already instantiated object. For example if we are working on a serialized JSON with the JSON_SKIP_CLASS_NAME flag.
 
 In this case we don't have the information about the reference class so using the normal unserialize function the result would be an associative array. Using unserializeToObj method we force the use of the object passed by parameter.
 
 ```PHP
 $obj = new MyClass();
-$json = JsonSerialize::serialize($obj , JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+$json = JsonSerialize::serialize($obj , JsonSerialize::JSON_SKIP_CLASS_NAME);
 
 
 $obj2 = new MyClass();
 JsonSerialize::unserializeToObj($json, $obj2);
 ```
+
+### Method unserializeWithMap
+
+```PHP
+public static unserializeWithMap(
+    string $json, 
+    JsonUnserializeMap $map, 
+    $depth = 512, 
+    $flags = 0
+): mixed
+```
+
+Deserialization with mapping is a very powerful method of mapping properties to change the type of in deserialization.
+The classic use is to force object deserialization of what would normally be an associative array. 
+In addition to nuti PHP native types there are special types in which you can indicate the class of an object and also reference another proprity for offects with recursive references
+
+```PHP
+$map = new JsonUnserializeMap(
+    [
+        '' => 'object';
+        'prop1/prop11' => 'bool',
+        'prop2' => 'cl:MyClass'
+    ]
+);
+$val = JsonSerialize::unserializeWithMap($json, $map);
+```
+
+See the [Mapping section](#unserialize-mapping) for more information
+
+
+## Unserialize Mapping
+
+The mapping is defined through the `JsonUnserializeMap` class.
+It can be initialized by passing an array of items to the constructor, and the list of items can be manipulated later with the methods 
+`addProp`, `removeProp`, `resetMap`
+
+A mapping object consists of the key (property identifier) value (property type) pair.
+**Please note that a mapping does not require the definition of all the properties of a structure but only the properties that need to be forced to a specific type**
+
+```PHP
+$map = new JsonUnserializeMap(
+    [
+    'prop' => 'object',
+    'prop/flag1' => 'int',
+    'prop/flag2' => 'bool'
+    ]
+);
+```
+
+### Property identifier
+
+- the empty identifier corresponds to the root element
+- Property levels are separated by the character `/`
+- The `*` character is the wildcard character, useful if you want to map all the elements of an array
+
+Some examples
+```PHP
+[
+    '' => type, // itendifies the root element
+    'prop' => type, // identifies the level 1 property ($val->prop or $val['prop'])
+    'v1/v2/v3' => type, // identifies the level 3 property ($val->v1->v2->v3 or $val['v1']['v2']['v3'])
+    'v1/*' => type, // identifies all the properties that are children of v1,
+    'v1/*/v3' => type, // identifies all v3 properties of the children of v1
+]
+```
+
+- The wildcard property but less priority than a specific property so you can define a type for all but a few properties. in the next example all child properties of element will be integers except flag which will be boolean
+
+```PHP
+[
+    'element/*' => 'int',
+    'element/flag' => 'bool',
+]
+```
+
+### Property type
+
+- The type is a string that can be a php native type `bool`, `boolean`, `float` , `int` , `integer` , `string` , `array` , `object` , `null`.
+- If the type starts with the character `?` then it can be nullable. This means that the json value is null is kept null otherwise it takes the value of the type. 
+- With the special type `cl:` followed by the class identifier, it is defined that the type is the object of the class defined
+- With the special type `rf:` followed by the property identifier without a wildcard, a reference to the property is defined. This only makes sense if the property is already defined and is an object
+
+```PHP
+$map = new JsonUnserializeMap(
+    [
+    '' => 'cl:' . MyClass::class, // root val is an istance of MyClass
+    'items/*' => '?cl:' . MyItems::class, // all element of items are istances of MyItems or null
+    'items/*/parent' => 'rf:', // all prop parent of all items ar a reference to root value
+    'obj' => '?object' // obj can be null or an object
+    ]
+);
+
+```
+
+notes:
+When defining a class type `cl:` it is initialized by also executing the __wakeup and unserialize methods if they exist
+When defining a reference `rf:` all child values of this object in the json are ignored and since the class is already initialized no __wakeup or __unserialie methods are executed
 
 ## How works
 
