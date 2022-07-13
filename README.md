@@ -94,17 +94,17 @@ $json = json_encode($obj);
 ```
 Extending the **AbstractJsonSerializable** class that implements the [JsonSerializable interface](https://www.php.net/manual/en/class.jsonserializable.php) allows to use the normal json_encode function of PHP obtaining for the object that extends this class the same result that you would get using *JsonSerialize::serialize*
 
-### Flag JSON_SERIALIZE_SKIP_CLASS_NAME
+### Flag JSON_SKIP_CLASS_NAME
 
 In some circumstances it can be useful to serialize an object in JSON without exposing the class. For example if we want to send the contents of an object to a browser via an AJAX call.
-In these cases we can use the JSON_SERIALIZE_SKIP_CLASS_NAME flag in addition to the normal flags of the json_encode function.
+In these cases we can use the JSON_SKIP_CLASS_NAME flag in addition to the normal flags of the json_encode function.
 
 ```PHP
 use Amk\JsonSerialize\JsonSerialize;
 
 $json = JsonSerialize::serialize(
     $value,
-    JSON_PRETTY_PRINT | JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME
+    JSON_PRETTY_PRINT | JsonSerialize::JSON_SKIP_CLASS_NAME
 );
 ```
 
@@ -121,7 +121,7 @@ In some circumstances, it is useful to be able to process the data structure bef
 Using the serializeToData method, you get the value that would be passed to the json_encode function with the serialize method
 
 ```PHP
-$data = JsonSerialize::serializeToData($obj, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+$data = JsonSerialize::serializeToData($obj, JsonSerialize::JSON_SKIP_CLASS_NAME);
 $data['extraProp'] = true;
 unset($data['prop']);
 $json = json_encode($data);
@@ -138,13 +138,13 @@ public static JsonSerialize::unserializeToObj(
 ) : object
 ```
 
-In some circumstances it may be useful to unserialize JSON data in an already instantiated object. For example if we are working on a serialized JSON with the JSON_SERIALIZE_SKIP_CLASS_NAME flag.
+In some circumstances it may be useful to unserialize JSON data in an already instantiated object. For example if we are working on a serialized JSON with the JSON_SKIP_CLASS_NAME flag.
 
 In this case we don't have the information about the reference class so using the normal unserialize function the result would be an associative array. Using unserializeToObj method we force the use of the object passed by parameter.
 
 ```PHP
 $obj = new MyClass();
-$json = JsonSerialize::serialize($obj , JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+$json = JsonSerialize::serialize($obj , JsonSerialize::JSON_SKIP_CLASS_NAME);
 
 
 $obj2 = new MyClass();

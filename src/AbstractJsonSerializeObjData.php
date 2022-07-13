@@ -11,6 +11,7 @@ namespace Amk\JsonSerialize;
 use Exception;
 use ReflectionClass;
 use ReflectionObject;
+use stdClass;
 
 /**
  * This calsse contains the logic that converts objects into values ready to be encoded in json
@@ -18,7 +19,8 @@ use ReflectionObject;
 abstract class AbstractJsonSerializeObjData
 {
     const CLASS_KEY_FOR_JSON_SERIALIZE = 'CL_-=_-=';
-    const JSON_SERIALIZE_SKIP_CLASS_NAME = 1073741824; // 30 bit mask
+    const JSON_SKIP_CLASS_NAME = 0b01000000000000000000000000000000; // 30 bit mask
+    const JSON_SKIP_SANITIZE   = 0b10000000000000000000000000000000; // 31 bit mask
 
     /**
      * Convert object to array with private and protected proprieties.
@@ -35,7 +37,7 @@ abstract class AbstractJsonSerializeObjData
         $reflect = new ReflectionObject($obj);
         $result = [];
 
-        if (!($flags & self::JSON_SERIALIZE_SKIP_CLASS_NAME)) {
+        if (!($flags & self::JSON_SKIP_CLASS_NAME)) {
             $result[self::CLASS_KEY_FOR_JSON_SERIALIZE] = $reflect->name;
         }
 
