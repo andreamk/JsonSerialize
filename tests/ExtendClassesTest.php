@@ -41,7 +41,7 @@ final class ExtendClassesTest extends TestCase
 
         $serializedValue = JsonSerialize::serialize(
             $value,
-            JSON_PRETTY_PRINT | JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME
+            JSON_PRETTY_PRINT | JsonSerialize::JSON_SKIP_CLASS_NAME
         );
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertEquals($value->getArray(), $unserializedValue, 'Test sierialize obj with skip props and skip class name');

@@ -79,7 +79,7 @@ final class MappingTest extends TestCase
         );
 
         $value  = $obj;
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
         $unserObj = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertSame(is_object($unserObj), true, 'isn\'t object');
@@ -150,7 +150,7 @@ final class MappingTest extends TestCase
         );
 
         $value  = $obj;
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
         $unserObj = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($obj, $unserObj);
@@ -179,7 +179,7 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
         $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
@@ -216,7 +216,7 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
         $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
@@ -256,7 +256,7 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
         $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
@@ -281,7 +281,7 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SERIALIZE_SKIP_CLASS_NAME);
+        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
         $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
