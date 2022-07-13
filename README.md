@@ -132,9 +132,9 @@ $json = json_encode($data);
 ```PHP
 public static JsonSerialize::unserializeToObj(
     string $json, 
-    object $obj, 
-    $depth = 512, 
-    $flags = 0
+    object|string $obj, 
+    int $depth = 512, 
+    int $flags = 0
 ) : object
 ```
 

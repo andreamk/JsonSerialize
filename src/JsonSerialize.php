@@ -102,10 +102,10 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     /**
      * Unserialize json on passed object
      *
-     * @param string  $json  json string
-     * @param object  $obj   object to fill
-     * @param integer $depth json_decode depth
-     * @param integer $flags json_decode flags
+     * @param string        $json  json string
+     * @param object|string $obj   object or class name to fill
+     * @param integer       $depth json_decode depth
+     * @param integer       $flags json_decode flags
      *
      * @link https://www.php.net/manual/en/function.json-decode.php
      *
@@ -113,7 +113,10 @@ class JsonSerialize extends AbstractJsonSerializeObjData
      */
     public static function unserializeToObj($json, $obj, $depth = 512, $flags = 0)
     {
-        if (!is_object($obj)) {
+        if (is_object($obj)) {
+        } elseif (is_string($obj) && class_exists($obj)) {
+            $obj = self::getObjFromClass($obj);
+        } else {
             throw new Exception('invalid obj param');
         }
         $value = json_decode($json, true, $depth, $flags);
