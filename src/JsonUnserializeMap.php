@@ -176,13 +176,7 @@ class JsonUnserializeMap
         switch (substr($type, 0, 3)) {
             case 'cl:':
                 $newClassName = (string) substr($type, 3); // in PHP 5.6- return false if empty
-                if (class_exists($newClassName)) {
-                    $classReflect = new ReflectionClass($newClassName);
-                    $newObj = $classReflect->newInstanceWithoutConstructor();
-                } else {
-                    $newObj = new \StdClass();
-                }
-                return $newObj;
+                return JsonSerialize::getObjFromClass($newClassName);
             case 'rf:':
                 $reference = (string) substr($type, 3); // in PHP 5.6- return false if empty
                 $isReference = true;

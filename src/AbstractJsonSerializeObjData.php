@@ -161,13 +161,7 @@ abstract class AbstractJsonSerializeObjData
                         $result[$key] = self::jsonDataToValue($arrayVal, $map);
                     }
                 } else {
-                    if (class_exists($newClassName)) {
-                        $classReflect = new ReflectionClass($newClassName);
-                        $newObj = $classReflect->newInstanceWithoutConstructor();
-                    } else {
-                        $newObj = new \StdClass();
-                    }
-                    $result = self::fillObjFromValue($value, $newObj, $map);
+                    $result = self::fillObjFromValue($value, self::getObjFromClass($newClassName), $map);
                 }
                 return $result;
             case 'boolean':
@@ -178,6 +172,24 @@ abstract class AbstractJsonSerializeObjData
                 return $value;
             default:
                 return null;
+        }
+    }
+
+    /**
+     * Get object from class name, if class don't exists return StdClass.
+     * the object is intialized without call the constructor.
+     *
+     * @param string $class class name
+     *
+     * @return object
+     */
+    final public static function getObjFromClass($class)
+    {
+        if (class_exists($class)) {
+            $classReflect = new ReflectionClass($class);
+            return $classReflect->newInstanceWithoutConstructor();
+        } else {
+            return new \StdClass();
         }
     }
 
