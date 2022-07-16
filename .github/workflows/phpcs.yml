@@ -1,4 +1,4 @@
-name: PSR12 code
+name: PSR12, PHPStan
 
 on: [push, pull_request]
 
