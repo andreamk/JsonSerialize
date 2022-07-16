@@ -208,7 +208,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
         }
 
         if ($use_mb) {
-            $encoding = mb_detect_encoding($string, mb_detect_order(), true);
+            $encoding = mb_detect_encoding($string, null, true);
             if ($encoding) {
                 return mb_convert_encoding($string, 'UTF-8', $encoding);
             } else {
