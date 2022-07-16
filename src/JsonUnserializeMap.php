@@ -189,14 +189,14 @@ class JsonUnserializeMap
         switch ($type) {
             case 'bool':
             case 'boolean':
-                return (bool) is_scalar($value) ?  $value : false;
+                return (is_scalar($value) ? ((bool) $value) : false);
             case 'float':
-                return (float) is_scalar($value) ?  $value : 0;
+                return (is_scalar($value) ? ((float) $value) : 0.0);
             case 'int':
             case 'integer':
-                return (int) is_scalar($value) ?  $value : 0;
+                return (is_scalar($value) ? ((int) $value) : 0);
             case 'string':
-                return (string) is_scalar($value) ?  $value : '';
+                return (is_scalar($value) ? ((string) $value) : '');
             case 'array':
                 return (array) $value;
             case 'object':

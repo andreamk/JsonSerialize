@@ -84,8 +84,6 @@ final class MappingTest extends TestCase
         }
         $unserObj = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
-        var_dump($unserObj);
-
         $this->assertSame(is_object($unserObj), true, 'isn\'t object');
         $this->assertSame(is_object($unserObj->intVals), true, 'isn\'t object'); // @phpstan-ignore-line
         $this->assertSame(is_object($unserObj->floatVals), true, 'isn\'t object'); // @phpstan-ignore-line
