@@ -57,7 +57,9 @@ final class StdClassTest extends TestCase
         $obj->a = 1;
         $obj->b = [1,2,3];
 
-        $serializedValue = JsonSerialize::serialize($obj, JSON_PRETTY_PRINT | JsonSerialize::JSON_SKIP_CLASS_NAME);
+        if (($serializedValue = JsonSerialize::serialize($obj, JSON_PRETTY_PRINT | JsonSerialize::JSON_SKIP_CLASS_NAME)) == false) {
+            $this->assertTrue($serializedValue, 'serialize fail'); // @phpstan-ignore-line
+        }
         $unserializedValue = new stdClass();
         $unserializedValue = JsonSerialize::unserializeToObj($serializedValue, $unserializedValue);
         $this->assertEquals($obj, $unserializedValue, 'Test JSON_SERIALIZE_SKIP_CLASS_NAME flag');

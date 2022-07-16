@@ -25,7 +25,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
      *
      * @link https://www.php.net/manual/en/function.json-encode.php
      *
-     * @return string|bool  Returns a JSON encoded string on success or false on failure.
+     * @return string|false  Returns a JSON encoded string on success or false on failure.
      */
     public static function serialize($value, $flags = 0, $depth = 512)
     {

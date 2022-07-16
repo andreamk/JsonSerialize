@@ -13,7 +13,7 @@ namespace Amk\JsonSerialize\Tests\Examples;
  */
 class ExampleMappingSub extends \Amk\JsonSerialize\AbstractJsonSerializable
 {
-    /** @var string */
+    /** @var ExampleMapping */
     protected $parent = null;
     /** @var string[] */
     protected $array = [ 'a', 'b', 'c'];
