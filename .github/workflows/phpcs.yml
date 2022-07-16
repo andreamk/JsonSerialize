@@ -21,3 +21,6 @@ jobs:
 
       - name: Detecting PHP Code Standards Violations
         run: composer run-script phpcs
+      
+      - name: PHP stan analysis
+        run: composer run-script phpstan
