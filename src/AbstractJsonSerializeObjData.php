@@ -135,6 +135,7 @@ abstract class AbstractJsonSerializeObjData
                 }
                 switch (gettype($mappedVal)) {
                     case 'array':
+                        /** @var mixed[] $mappedVal */
                         $result = [];
                         foreach ($mappedVal as $key => $arrayVal) {
                             $map->setCurrent($key, $current);
@@ -142,6 +143,7 @@ abstract class AbstractJsonSerializeObjData
                         };
                         return $result;
                     case 'object':
+                        /** @var object $mappedVal */
                         if (!is_array($value)) {
                             $value = [];
                         }

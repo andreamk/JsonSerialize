@@ -85,8 +85,8 @@ class JsonSerialize extends AbstractJsonSerializeObjData
      *
      * @param string             $json  json string
      * @param JsonUnserializeMap $map   values mapping
-     * @param integer            $depth json_decode depth
-     * @param integer            $flags json_decode flags
+     * @param int<1, max>        $depth json_decode depth
+     * @param int                $flags json_decode flags
      *
      * @link https://www.php.net/manual/en/function.json-decode.php
      *
@@ -166,7 +166,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
             }
         } elseif (is_object($data)) {
             $output = new stdClass();
-            foreach ($data as $id => $el) {
+            foreach ((array) $data as $id => $el) {
                 if (is_string($id)) {
                     $clean_id = self::convertString($id);
                 } else {
@@ -254,7 +254,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
 
         // Attempt to strip the bad chars if requested (not recommended).
         if ($strip && function_exists('iconv')) {
-            return iconv('utf-8', 'utf-8', $string);
+            return (string) iconv('utf-8', 'utf-8', $string);
         }
 
         return '';
