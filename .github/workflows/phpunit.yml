@@ -1,4 +1,4 @@
-name: Unit tests PHP 7,8
+name: Unit tests on PHP 7, 8
 
 on: [push, pull_request]
 
@@ -28,7 +28,7 @@ jobs:
       run: php -v
 
     - name: Update composer.lock
-      run: composer update --ignore-platform-reqs
+      run: composer update
       
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
@@ -43,10 +43,7 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --ignore-platform-reqs
-
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
+      run: composer install --prefer-dist --no-progress
 
     - name: Run test suite
       run: composer run-script unittest
