@@ -1,4 +1,4 @@
-name: Unit tests on PHP 5.4
+name: Unit tests PHP 5.4,5.6
 
 on: [push, pull_request]
 
@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [5.4]
+        php-versions: [5.4, 5.6]
     name: PHP ${{ matrix.php-versions }}
 
     steps:
@@ -26,9 +26,15 @@ jobs:
     
     - name: Check PHP Version
       run: php -v
+    
+    - name: Remove phpstan from composer
+      run: sed -i "/\bphpstan\b/d" composer.json
 
     - name: Update composer.lock
       run: composer update --ignore-platform-reqs
+      
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
 
     - name: Cache Composer packages
       id: composer-cache
@@ -41,9 +47,6 @@ jobs:
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --ignore-platform-reqs
-
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
 
     - name: Run test suite
       run: composer run-script unittest

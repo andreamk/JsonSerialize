@@ -1,4 +1,4 @@
-name: PSR12, PHPStan
+name: PHPStan
 
 on: [push, pull_request]
 
@@ -18,6 +18,6 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
-
-      - name: Detecting PHP Code Standards Violations
-        run: composer run-script phpcs
+      
+      - name: PHP stan analysis
+        run: composer run-script phpstan

@@ -1,4 +1,4 @@
-name: Unit tests on PHP 7, 8
+name: Unit tests PHP 7,8
 
 on: [push, pull_request]
 
@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [7.4, 8.0, 8.1]
+        php-versions: [7, 8]
     name: PHP ${{ matrix.php-versions }}
 
     steps:
