@@ -1,12 +1,16 @@
 {
     "name": "andreamk/jsonserialize",
-    "description": "Library that improves object serialization via json",
+    "description": "Library that improves object serialization and deserialization via JSON",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Amk\\JsonSerialize\\Tests\\": "tests/",
             "Amk\\JsonSerialize\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Amk\\JsonSerialize\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -43,6 +47,6 @@
         "phpstan": "./vendor/bin/phpstan analyse -c tests/phpstan.neon",
         "phpcs": "./vendor/bin/phpcs --standard=./tests/phpsniff_ruleset.xml -v .",
         "phpcbf": "./vendor/bin/phpcbf --standard=./tests/phpsniff_ruleset.xml --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 -w -v .",
-        "unittest": "./vendor/bin/phpunit tests"
+        "phpunit": "./vendor/bin/phpunit tests"
     }
 }

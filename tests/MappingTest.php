@@ -22,6 +22,40 @@ use stdClass;
 final class MappingTest extends TestCase
 {
     /**
+     * Add and remove props in class map
+     *
+     * @return void
+     */
+    public function testClassMapProps()
+    {
+        $map = new JsonUnserializeMap();
+        $propTest = 'prop/prop1/prop2';
+
+        $map->addProp($propTest, 'string');
+        $this->assertTrue($map->setCurrent($propTest), 'Current prop must be mapped');
+
+        $map->removeProp($propTest);
+        $this->assertFalse($map->setCurrent($propTest), 'Current prop don\'t exists');
+
+        $mutipleProps = [
+            'prop1',
+            'prop2',
+            'prop2/sub',
+            'prop3/sub/sbu/sbu'
+        ];
+
+        foreach ($mutipleProps as $propTest) {
+            $propTest = 'prop';
+            $map->addProp($propTest, 'string');
+            $this->assertTrue($map->setCurrent($propTest), 'Current prop must be mapped');
+        }
+        $map->resetMap();
+        foreach ($mutipleProps as $propTest) {
+            $this->assertFalse($map->setCurrent($propTest), 'Current prop must be mapped');
+        }
+    }
+
+    /**
      * Tests scalar mapping
      *
      * @return void
