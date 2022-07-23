@@ -1,4 +1,4 @@
-name: PSR12, PHPStan
+name: PSR12
 
 on: [push, pull_request]
 
