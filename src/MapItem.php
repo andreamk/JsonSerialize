@@ -15,6 +15,6 @@ class MapItem
 {
     /** @var ?string */
     public $type = null;
-    /** @var MapItem */
+    /** @var self[] */
     public $childs = [];
 }

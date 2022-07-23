@@ -9,7 +9,6 @@
 namespace Amk\JsonSerialize;
 
 use Exception;
-use ReflectionClass;
 
 /**
  * Unserialize mapping
@@ -39,7 +38,7 @@ class JsonUnserializeMap
     private $currentProp = '';
     /** @var bool */
     private $isCurrentMapped = false;
-    /** @var mixed */
+    /** @var ?string */
     private $currentType = null;
     /** @var object[] */
     private $objReferences = [];
@@ -165,7 +164,7 @@ class JsonUnserializeMap
             return $value;
         }
 
-        $type = $this->currentType;
+        $type = (string) $this->currentType;
         if ($type[0] === '?') {
             if ($value === null) {
                 return null;
@@ -190,14 +189,14 @@ class JsonUnserializeMap
         switch ($type) {
             case 'bool':
             case 'boolean':
-                return (bool) $value;
+                return (is_scalar($value) ? ((bool) $value) : false);
             case 'float':
-                return (float) $value;
+                return (is_scalar($value) ? ((float) $value) : 0.0);
             case 'int':
             case 'integer':
-                return (int) $value;
+                return (is_scalar($value) ? ((int) $value) : 0);
             case 'string':
-                return (string) $value;
+                return (is_scalar($value) ? ((string) $value) : '');
             case 'array':
                 return (array) $value;
             case 'object':
@@ -225,7 +224,6 @@ class JsonUnserializeMap
         $cLevel = $this->map;
         if (strlen($prop) > 0) {
             $pArray = explode('/', $prop);
-            $cLevel = $this->map;
             foreach ($pArray as $cProp) {
                 if (!isset($cLevel->childs[$cProp])) {
                     $cLevel->childs[$cProp] = new MapItem();
@@ -245,9 +243,17 @@ class JsonUnserializeMap
      */
     public function removeProp($prop)
     {
-        if (isset($this->map[$prop])) {
-            unset($this->map[$prop]);
+        $cLevel = $this->map;
+        if (strlen($prop) > 0) {
+            $pArray = explode('/', $prop);
+            foreach ($pArray as $cProp) {
+                if (!isset($cLevel->childs[$cProp])) {
+                    return;
+                }
+                $cLevel = $cLevel->childs[$cProp];
+            }
         }
+        $cLevel->type = null;
     }
 
     /**
@@ -257,6 +263,6 @@ class JsonUnserializeMap
      */
     public function resetMap()
     {
-        $this->map = [];
+        $this->map = new MapItem();
     }
 }

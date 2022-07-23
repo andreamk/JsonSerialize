@@ -19,13 +19,13 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     /**
      * Return json string
      *
-     * @param mixed   $value value to serialize
-     * @param integer $flags json_encode flags
-     * @param integer $depth json_encode depth
+     * @param mixed       $value value to serialize
+     * @param int         $flags json_encode flags
+     * @param int<1, max> $depth json_encode depth
      *
      * @link https://www.php.net/manual/en/function.json-encode.php
      *
-     * @return string|bool  Returns a JSON encoded string on success or false on failure.
+     * @return string|false  Returns a JSON encoded string on success or false on failure.
      */
     public static function serialize($value, $flags = 0, $depth = 512)
     {
@@ -66,9 +66,9 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     /**
      * Unserialize from json
      *
-     * @param string  $json  json string
-     * @param integer $depth json_decode depth
-     * @param integer $flags json_decode flags
+     * @param string      $json  json string
+     * @param int<1, max> $depth json_decode depth
+     * @param int         $flags json_decode flags
      *
      * @link https://www.php.net/manual/en/function.json-decode.php
      *
@@ -85,8 +85,8 @@ class JsonSerialize extends AbstractJsonSerializeObjData
      *
      * @param string             $json  json string
      * @param JsonUnserializeMap $map   values mapping
-     * @param integer            $depth json_decode depth
-     * @param integer            $flags json_decode flags
+     * @param int<1, max>        $depth json_decode depth
+     * @param int                $flags json_decode flags
      *
      * @link https://www.php.net/manual/en/function.json-decode.php
      *
@@ -104,8 +104,8 @@ class JsonSerialize extends AbstractJsonSerializeObjData
      *
      * @param string        $json  json string
      * @param object|string $obj   object or class name to fill
-     * @param integer       $depth json_decode depth
-     * @param integer       $flags json_decode flags
+     * @param int<1, max>   $depth json_decode depth
+     * @param int           $flags json_decode flags
      *
      * @link https://www.php.net/manual/en/function.json-decode.php
      *
@@ -166,7 +166,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
             }
         } elseif (is_object($data)) {
             $output = new stdClass();
-            foreach ($data as $id => $el) {
+            foreach ((array) $data as $id => $el) {
                 if (is_string($id)) {
                     $clean_id = self::convertString($id);
                 } else {
@@ -208,7 +208,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
         }
 
         if ($use_mb) {
-            $encoding = mb_detect_encoding($string, mb_detect_order(), true);
+            $encoding = mb_detect_encoding($string, null, true);
             if ($encoding) {
                 return mb_convert_encoding($string, 'UTF-8', $encoding);
             } else {
@@ -254,7 +254,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
 
         // Attempt to strip the bad chars if requested (not recommended).
         if ($strip && function_exists('iconv')) {
-            return iconv('utf-8', 'utf-8', $string);
+            return (string) iconv('utf-8', 'utf-8', $string);
         }
 
         return '';

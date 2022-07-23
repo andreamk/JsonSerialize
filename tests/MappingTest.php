@@ -22,6 +22,40 @@ use stdClass;
 final class MappingTest extends TestCase
 {
     /**
+     * Add and remove props in class map
+     *
+     * @return void
+     */
+    public function testClassMapProps()
+    {
+        $map = new JsonUnserializeMap();
+        $propTest = 'prop/prop1/prop2';
+
+        $map->addProp($propTest, 'string');
+        $this->assertTrue($map->setCurrent($propTest), 'Current prop must be mapped');
+
+        $map->removeProp($propTest);
+        $this->assertFalse($map->setCurrent($propTest), 'Current prop don\'t exists');
+
+        $mutipleProps = [
+            'prop1',
+            'prop2',
+            'prop2/sub',
+            'prop3/sub/sbu/sbu'
+        ];
+
+        foreach ($mutipleProps as $propTest) {
+            $propTest = 'prop';
+            $map->addProp($propTest, 'string');
+            $this->assertTrue($map->setCurrent($propTest), 'Current prop must be mapped');
+        }
+        $map->resetMap();
+        foreach ($mutipleProps as $propTest) {
+            $this->assertFalse($map->setCurrent($propTest), 'Current prop must be mapped');
+        }
+    }
+
+    /**
      * Tests scalar mapping
      *
      * @return void
@@ -31,7 +65,7 @@ final class MappingTest extends TestCase
         $obj = new stdClass();
 
         $obj->intVals = new stdClass();
-        $obj->intVals->toFloat = 1;
+        $obj->intVals->toFloat = 2;
         $obj->intVals->toBool = 10;
         $obj->intVals->toString = 10;
         $obj->intVals->toNULL = 10;
@@ -78,36 +112,38 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $value  = $obj;
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
+        $value = $obj;
+        if (($serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME)) == false) {
+            $this->assertTrue($serializedValue, 'serialize fail'); // @phpstan-ignore-line
+        }
         $unserObj = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertSame(is_object($unserObj), true, 'isn\'t object');
-        $this->assertSame(is_object($unserObj->intVals), true, 'isn\'t object');
-        $this->assertSame(is_object($unserObj->floatVals), true, 'isn\'t object');
-        $this->assertSame(is_object($unserObj->stringVals), true, 'isn\'t object');
-        $this->assertSame(is_object($unserObj->nullVal), true, 'isn\'t object');
+        $this->assertSame(is_object($unserObj->intVals), true, 'isn\'t object'); // @phpstan-ignore-line
+        $this->assertSame(is_object($unserObj->floatVals), true, 'isn\'t object'); // @phpstan-ignore-line
+        $this->assertSame(is_object($unserObj->stringVals), true, 'isn\'t object'); // @phpstan-ignore-line
+        $this->assertSame(is_object($unserObj->nullVal), true, 'isn\'t object'); // @phpstan-ignore-line
 
-        $this->assertSame($unserObj->intVals->toFloat, (float) $obj->intVals->toFloat);
-        $this->assertSame($unserObj->intVals->toBool, (bool) $obj->intVals->toBool);
-        $this->assertSame($unserObj->intVals->toString, (string) $obj->intVals->toString);
-        $this->assertSame($unserObj->intVals->toNULL, null);
-        $this->assertSame($unserObj->intVals->notMapperd, $obj->intVals->notMapperd);
+        $this->assertSame($unserObj->intVals->toFloat, (float) $obj->intVals->toFloat); // @phpstan-ignore-line
+        $this->assertSame($unserObj->intVals->toBool, (bool) $obj->intVals->toBool); // @phpstan-ignore-line
+        $this->assertSame($unserObj->intVals->toString, (string) $obj->intVals->toString); // @phpstan-ignore-line
+        $this->assertSame($unserObj->intVals->toNULL, null); // @phpstan-ignore-line
+        $this->assertSame($unserObj->intVals->notMapperd, $obj->intVals->notMapperd); // @phpstan-ignore-line
 
-        $this->assertSame($unserObj->floatVals->toInt, (int) $obj->floatVals->toInt);
-        $this->assertSame($unserObj->floatVals->toString, (string) $obj->floatVals->toString);
-        $this->assertSame($unserObj->floatVals->notMapperd, $obj->floatVals->notMapperd);
+        $this->assertSame($unserObj->floatVals->toInt, (int) $obj->floatVals->toInt); // @phpstan-ignore-line
+        $this->assertSame($unserObj->floatVals->toString, (string) $obj->floatVals->toString); // @phpstan-ignore-line
+        $this->assertSame($unserObj->floatVals->notMapperd, $obj->floatVals->notMapperd); // @phpstan-ignore-line
 
-        $this->assertSame($unserObj->stringVals->toInt, (int) $obj->stringVals->toInt);
-        $this->assertSame($unserObj->stringVals->toFloat, (float) $obj->stringVals->toFloat);
-        $this->assertSame($unserObj->stringVals->toBool, (bool) $obj->stringVals->toBool);
-        $this->assertSame($unserObj->stringVals->notMapperd, $obj->stringVals->notMapperd);
+        $this->assertSame($unserObj->stringVals->toInt, (int) $obj->stringVals->toInt); // @phpstan-ignore-line
+        $this->assertSame($unserObj->stringVals->toFloat, (float) $obj->stringVals->toFloat); // @phpstan-ignore-line
+        $this->assertSame($unserObj->stringVals->toBool, (bool) $obj->stringVals->toBool); // @phpstan-ignore-line
+        $this->assertSame($unserObj->stringVals->notMapperd, $obj->stringVals->notMapperd); // @phpstan-ignore-line
 
-        $this->assertSame($unserObj->nullVal->toString, (string) null);
-        $this->assertSame($unserObj->nullVal->toInt, (int) null);
-        $this->assertSame($unserObj->nullVal->toBool, (bool) null);
-        $this->assertSame($unserObj->nullVal->toFloat, (float) null);
-        $this->assertSame($unserObj->nullVal->notMapperd, $obj->nullVal->notMapperd);
+        $this->assertSame($unserObj->nullVal->toString, (string) null); // @phpstan-ignore-line
+        $this->assertSame($unserObj->nullVal->toInt, (int) null); // @phpstan-ignore-line
+        $this->assertSame($unserObj->nullVal->toBool, (bool) null); // @phpstan-ignore-line
+        $this->assertSame($unserObj->nullVal->toFloat, (float) null); // @phpstan-ignore-line
+        $this->assertSame($unserObj->nullVal->notMapperd, $obj->nullVal->notMapperd); // @phpstan-ignore-line
     }
 
      /**
@@ -150,7 +186,9 @@ final class MappingTest extends TestCase
         );
 
         $value  = $obj;
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
+        if (($serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME)) == false) {
+            $this->assertTrue($serializedValue, 'serialize fail'); // @phpstan-ignore-line
+        }
         $unserObj = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($obj, $unserObj);
@@ -179,7 +217,9 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
+        if (($serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME)) == false) {
+            $this->assertTrue($serializedValue, 'serialize fail'); // @phpstan-ignore-line
+        }
         $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
@@ -216,7 +256,9 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
+        if (($serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME)) == false) {
+            $this->assertTrue($serializedValue, 'serialize fail'); // @phpstan-ignore-line
+        }
         $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
@@ -256,7 +298,9 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
+        if (($serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME)) == false) {
+            $this->assertTrue($serializedValue, 'serialize fail'); // @phpstan-ignore-line
+        }
         $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);
@@ -281,7 +325,9 @@ final class MappingTest extends TestCase
             ]
         );
 
-        $serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME);
+        if (($serializedValue = JsonSerialize::serialize($value, JsonSerialize::JSON_SKIP_CLASS_NAME)) == false) {
+            $this->assertTrue($serializedValue, 'serialize fail'); // @phpstan-ignore-line
+        }
         $unserVal = JsonSerialize::unserializeWithMap($serializedValue, $map);
 
         $this->assertEquals($value, $unserVal);

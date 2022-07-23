@@ -1,6 +1,6 @@
 # JsonSerialize
 
-![PSR12 checks](https://github.com/andreamk/JsonSerialize/actions/workflows/phpcs.yml/badge.svg) ![PHPUnit checks](https://github.com/andreamk/JsonSerialize/actions/workflows/phpunit.yml/badge.svg) 
+[![PHPStan](https://github.com/andreamk/JsonSerialize/actions/workflows/phpstan.yml/badge.svg)](https://github.com/andreamk/JsonSerialize/actions/workflows/phpstan.yml) [![PSR12](https://github.com/andreamk/JsonSerialize/actions/workflows/phpcs.yml/badge.svg)](https://github.com/andreamk/JsonSerialize/actions/workflows/phpcs.yml) [![PHPUnit 5.4,5.6](https://github.com/andreamk/JsonSerialize/actions/workflows/phpunit_php5.yml/badge.svg)](https://github.com/andreamk/JsonSerialize/actions/workflows/phpunit_php5.yml) [![PHPUnit 7, 8](https://github.com/andreamk/JsonSerialize/actions/workflows/phpunit.yml/badge.svg)](https://github.com/andreamk/JsonSerialize/actions/workflows/phpunit.yml)
 
 This library combines the features of the native PHP serialization with the JSON portability, in particular it allows to encode with JSON also **protected and private properties** of an object.
 When defined in classes, the magic methods [__sleep](https://www.php.net/manual/en/language.oop5.magic.php#object.sleep) , [__serialize](https://www.php.net/manual/en/language.oop5.magic.php#object.serialize), [__wakeup](https://www.php.net/manual/en/language.oop5.magic.php#object.wakeup) and [__unserialize](https://www.php.net/manual/en/language.oop5.magic.php#object.unserialize) are used in the same way as they are used in serialization.
@@ -17,6 +17,14 @@ Via Composer
 ```
 composer require andreamk/jsonserialize 
 ```
+
+It's possibile include the library either using the composer autoloader or using the library autoloader
+
+```PHP
+require_once PATH . '/jsonserialize/src/Autoloader.php';
+\Amk\JsonSerialize\Autoloader::register();
+```
+
 
 ## Basic usage
 
