@@ -114,4 +114,14 @@ class ExampleClassResource extends \Amk\JsonSerialize\AbstractJsonSerializable
     {
         $this->openFile();
     }
+
+    /**
+     * Return class name
+     *
+     * @return string
+     */
+    public static function getClassName()
+    {
+        return __CLASS__;
+    }
 }

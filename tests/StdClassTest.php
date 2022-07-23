@@ -30,7 +30,7 @@ final class StdClassTest extends TestCase
 
         $value  = $obj;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertEquals($value, $unserializedValue, 'Test stdClass object');
 
@@ -42,14 +42,14 @@ final class StdClassTest extends TestCase
 
         $value  = $obj;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertEquals($value, $unserializedValue, 'Test stdClass object multiple level');
 
         $obj->c->e = $obj;
         $value = $obj;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($unserializedValue->c->e, null, 'Test stdClass object recursion'); /** @phpstan-ignore-line */
 

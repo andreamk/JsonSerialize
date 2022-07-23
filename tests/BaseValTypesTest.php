@@ -25,61 +25,61 @@ final class BaseValTypesTest extends TestCase
     {
         $value  = null;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test null value');
 
         $value  = 0;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test 0 int');
 
         $value  = 10;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test 10 int');
 
         $value  = -10;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test -10 int');
 
         $value  = 10.1;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test 10.1 float');
 
         $value  = '';
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test empty string');
 
         $value  = 'test string';
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test string');
 
         $value  = '1000';
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test numeric string');
 
         $value  = true;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test bool true');
 
         $value  = false;
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test bool false');
     }
@@ -93,25 +93,25 @@ final class BaseValTypesTest extends TestCase
     {
         $value  = [];
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test empty array');
 
         $value  = [1,2,3,4];
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test int array');
 
         $value  = ['a','b','c','d'];
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test string array');
 
         $value  = ['a' => 1,'b' => 2,'c' => 3,'d' => 4];
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test strgin array keys');
 
@@ -131,7 +131,7 @@ final class BaseValTypesTest extends TestCase
             ]
         ];
         $serializedValue = JsonSerialize::serialize($value);
-        $this->assertIsString($serializedValue);
+        $this->assertTrue(is_string($serializedValue), 'Value is string');
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertSame($value, $unserializedValue, 'Test multi level array');
     }
