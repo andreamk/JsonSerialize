@@ -79,6 +79,7 @@ final class ExtendClassesTest extends TestCase
         $serializedValue = JsonSerialize::serialize($object, JSON_PRETTY_PRINT);
         $this->assertTrue(is_string($serializedValue), 'Value is string');
         $object = new ExampleClassResource($testDir . '/test.txt');
+        /** @var ExampleClassResource $unserializedValue */
         $unserializedValue = JsonSerialize::unserialize($serializedValue);
         $this->assertInstanceOf(ExampleClassResource::getClassName(), $unserializedValue);
 

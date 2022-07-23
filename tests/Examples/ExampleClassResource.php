@@ -118,7 +118,7 @@ class ExampleClassResource extends \Amk\JsonSerialize\AbstractJsonSerializable
     /**
      * Return class name
      *
-     * @return string
+     * @return class-string<object>
      */
     public static function getClassName()
     {
