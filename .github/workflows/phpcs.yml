@@ -1,10 +1,8 @@
 name: PSR12
-
 on: [push, pull_request]
-
 jobs:
   phpcs:
-
+    name: PHP Code sniffer
     runs-on: ubuntu-latest
 
     steps:

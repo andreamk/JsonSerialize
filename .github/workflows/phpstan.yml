@@ -1,10 +1,8 @@
 name: PHPStan
-
 on: [push, pull_request]
-
 jobs:
-  phpcs:
-
+  phpstan:
+    name: PHPStan
     runs-on: ubuntu-latest
 
     steps:
