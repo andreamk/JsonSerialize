@@ -18,6 +18,14 @@ Via Composer
 composer require andreamk/jsonserialize 
 ```
 
+It's possibile include the library either using the composer autoloader or using the library autoloader
+
+```PHP
+require_once PATH . '/jsonserialize/src/Autoloader.php';
+\Amk\JsonSerialize\Autoloader::register();
+```
+
+
 ## Basic usage
 
 ```PHP
