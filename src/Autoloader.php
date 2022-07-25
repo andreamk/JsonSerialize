@@ -13,7 +13,7 @@ namespace Amk\JsonSerialize;
  */
 final class Autoloader
 {
-    const ROOT_NAMESPACE  = 'Amk\\JsonSerialize\\';
+    const ROOT_NAMESPACE = __NAMESPACE__ . '\\';
 
     /**
      * Register autoloader function
