@@ -102,7 +102,8 @@ $json = json_encode($obj);
 ```
 Extending the **AbstractJsonSerializable** class that implements the [JsonSerializable interface](https://www.php.net/manual/en/class.jsonserializable.php) allows to use the normal json_encode function of PHP obtaining for the object that extends this class the same result that you would get using *JsonSerialize::serialize*
 
-### Flag JSON_SKIP_CLASS_NAME
+### Flags
+#### - JSON_SKIP_CLASS_NAME
 
 In some circumstances it can be useful to serialize an object in JSON without exposing the class. For example if we want to send the contents of an object to a browser via an AJAX call.
 In these cases we can use the JSON_SKIP_CLASS_NAME flag in addition to the normal flags of the json_encode function.
@@ -115,6 +116,13 @@ $json = JsonSerialize::serialize(
     JSON_PRETTY_PRINT | JsonSerialize::JSON_SKIP_CLASS_NAME
 );
 ```
+#### - JSON_SKIP_MAGIC_METHODS
+
+When this flag is on, the __sleep and __serialize methods of the class are ignored.
+#### - JSON_SKIP_SANITIZE
+
+By default serialization applied string sanitization in case json_encode fails due to invalid characters.
+Activating this flag turns sanitization off.
 
 ### Method serializeToData
 

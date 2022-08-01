@@ -19,8 +19,9 @@ use stdClass;
 abstract class AbstractJsonSerializeObjData
 {
     const CLASS_KEY_FOR_JSON_SERIALIZE = 'CL_-=_-=';
-    const JSON_SKIP_CLASS_NAME = 0b01000000000000000000000000000000; // 30 bit mask
-    const JSON_SKIP_SANITIZE   = 0b10000000000000000000000000000000; // 31 bit mask
+    const JSON_SKIP_MAGIC_METHODS = 0b00100000000000000000000000000000; // 29 bit mask
+    const JSON_SKIP_CLASS_NAME    = 0b01000000000000000000000000000000; // 30 bit mask
+    const JSON_SKIP_SANITIZE      = 0b10000000000000000000000000000000; // 31 bit mask
 
     /**
      * Convert object to array with private and protected proprieties.
@@ -41,16 +42,20 @@ abstract class AbstractJsonSerializeObjData
             $result[self::CLASS_KEY_FOR_JSON_SERIALIZE] = $reflect->name;
         }
 
-        if (method_exists($obj, '__serialize')) {
-            $data = $obj->__serialize();
-            if (!is_array($data)) {
-                throw new Exception('__serialize method must return an array');
-            }
-            return array_merge($data, $result);
-        } elseif (method_exists($obj, '__sleep')) {
-            $includeProps = $obj->__sleep();
-            if (!is_array($includeProps)) {
-                throw new Exception('__sleep method must return an array');
+        if (!($flags & self::JSON_SKIP_MAGIC_METHODS)) {
+            if (method_exists($obj, '__serialize')) {
+                $data = $obj->__serialize();
+                if (!is_array($data)) {
+                    throw new Exception('__serialize method must return an array');
+                }
+                return array_merge($data, $result);
+            } elseif (method_exists($obj, '__sleep')) {
+                $includeProps = $obj->__sleep();
+                if (!is_array($includeProps)) {
+                    throw new Exception('__sleep method must return an array');
+                }
+            } else {
+                $includeProps = true;
             }
         } else {
             $includeProps = true;
