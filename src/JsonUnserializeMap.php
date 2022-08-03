@@ -27,6 +27,7 @@ use Exception;
  * Special types
  * cl:ClassName     Istance of class
  * rf:PropReference Referenct of other prop
+ * vl:val:scalar_type
  *
  * If type start with ? is nullable
  */
@@ -184,6 +185,14 @@ class JsonUnserializeMap
                 } else {
                     return null;
                 }
+                break;
+            case 'vl:':
+                if (preg_match('/^vl:(bool|boolean|float|int|integer|string|null):(.*)$/s', $type, $matches) !== 1) {
+                    throw new Exception('Invalid map format, fixed value must have value type ex. vl:10:int');
+                }
+                $type = $matches[1];
+                $value = $matches[2];
+                break;
         }
 
         switch ($type) {

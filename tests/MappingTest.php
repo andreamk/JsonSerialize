@@ -332,4 +332,35 @@ final class MappingTest extends TestCase
 
         $this->assertEquals($value, $unserVal);
     }
+
+    /**
+     * Test mapping with fixed value
+     *
+     * @return void
+     */
+    public function testFixedMapProps()
+    {
+        $testInt = 10;
+        $testFloat = (float) 5;
+        $testString = "abcde\nvl:int:10";
+        $testBool = true;
+        $testNull = null;
+
+        $map = new JsonUnserializeMap(
+            [
+            'test_int' => 'vl:int:' . $testInt,
+            'test_float' => 'vl:float:' . $testFloat,
+            'test_string' => 'vl:string:' . $testString,
+            'test_bool' => 'vl:bool:' . $testBool,
+            'test_null' => 'vl:null:',
+            ]
+        );
+
+        $unserVal = JsonSerialize::unserializeWithMap('{}', $map);
+
+        echo "\n\n UNSER VAL \n\n";
+        var_dump($unserVal);
+
+        $this->assertTrue(true);
+    }
 }
