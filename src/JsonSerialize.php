@@ -77,7 +77,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     public static function unserialize($json, $depth = 512, $flags = 0)
     {
         $publicArray = json_decode($json, true, $depth, $flags);
-        return self::jsonDataToValue($publicArray);
+        return self::jsonDataToValue($publicArray, $flags);
     }
 
     /**
@@ -96,7 +96,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     {
         $publicArray = json_decode($json, true, $depth, $flags);
         $map->setCurrent('');
-        return self::jsonDataToValue($publicArray, $map);
+        return self::jsonDataToValue($publicArray, $flags, $map);
     }
 
     /**
@@ -123,7 +123,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
         if (!is_array($value)) {
             throw new Exception('json value isn\'t an array');
         }
-        return self::fillObjFromValue($value, $obj);
+        return self::fillObjFromValue($value, $obj, $flags);
     }
 
     /**
