@@ -124,11 +124,12 @@ abstract class AbstractJsonSerializeObjData
      * Return value from json decoded data
      *
      * @param mixed               $value json decoded data
+     * @param int                 $flags flags bitmask
      * @param ?JsonUnserializeMap $map   unserialize map
      *
      * @return mixed
      */
-    final protected static function jsonDataToValue($value, $map = null)
+    final protected static function jsonDataToValue($value, $flags = 0, $map = null)
     {
         if ($map !== null) {
             $current = $map->getCurrent();
@@ -144,7 +145,7 @@ abstract class AbstractJsonSerializeObjData
                         $result = [];
                         foreach ($mappedVal as $key => $arrayVal) {
                             $map->setCurrent($key, $current);
-                            $result[$key] = self::jsonDataToValue($arrayVal, $map);
+                            $result[$key] = self::jsonDataToValue($arrayVal, $flags, $map);
                         };
                         return $result;
                     case 'object':
@@ -152,7 +153,7 @@ abstract class AbstractJsonSerializeObjData
                         if (!is_array($value)) {
                             $value = [];
                         }
-                        return self::fillObjFromValue($value, $mappedVal, $map);
+                        return self::fillObjFromValue($value, $mappedVal, $flags, $map);
                     default:
                         return $mappedVal;
                 }
@@ -168,10 +169,10 @@ abstract class AbstractJsonSerializeObjData
                         if ($map !== null) {
                             $map->setCurrent($key, $current);
                         }
-                        $result[$key] = self::jsonDataToValue($arrayVal, $map);
+                        $result[$key] = self::jsonDataToValue($arrayVal, $flags, $map);
                     }
                 } else {
-                    $result = self::fillObjFromValue($value, self::getObjFromClass($newClassName), $map);
+                    $result = self::fillObjFromValue($value, self::getObjFromClass($newClassName), $flags, $map);
                 }
                 return $result;
             case 'boolean':
@@ -208,11 +209,12 @@ abstract class AbstractJsonSerializeObjData
      *
      * @param mixed[]             $value value from json data
      * @param object              $obj   object to fill with json data
+     * @param int                 $flags flags bitmask
      * @param ?JsonUnserializeMap $map   unserialize map
      *
      * @return object
      */
-    final protected static function fillObjFromValue($value, $obj, $map = null)
+    final protected static function fillObjFromValue($value, $obj, $flags = 0, $map = null)
     {
         if ($map !== null) {
             $current = $map->getCurrent();
@@ -227,10 +229,11 @@ abstract class AbstractJsonSerializeObjData
                 if ($map !== null) {
                     $map->setCurrent($arrayProp, $current);
                 }
-                $obj->{$arrayProp} = self::jsonDataToValue($arrayValue, $map);
+                $obj->{$arrayProp} = self::jsonDataToValue($arrayValue, $flags, $map);
             }
         } else {
-            if (method_exists($obj, '__unserialize')) {
+            $skipMagicMethods = ($flags & self::JSON_SKIP_MAGIC_METHODS);
+            if (!$skipMagicMethods && method_exists($obj, '__unserialize')) {
                 $obj->__unserialize($value);
             } else {
                 $reflect = new ReflectionObject($obj);
@@ -246,10 +249,10 @@ abstract class AbstractJsonSerializeObjData
                     if (!array_key_exists($propName, $value) || $prop->isStatic()) {
                         continue;
                     }
-                    $prop->setValue($obj, self::jsonDataToValue($value[$propName], $map));
+                    $prop->setValue($obj, self::jsonDataToValue($value[$propName], $flags, $map));
                 }
 
-                if (method_exists($obj, '__wakeup')) {
+                if (!$skipMagicMethods && method_exists($obj, '__wakeup')) {
                     $obj->__wakeup();
                 }
             }
