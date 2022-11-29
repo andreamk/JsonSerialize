@@ -11,7 +11,6 @@ namespace Amk\JsonSerialize;
 use Exception;
 use ReflectionClass;
 use ReflectionObject;
-use stdClass;
 
 /**
  * This calsse contains the logic that converts objects into values ready to be encoded in json
@@ -27,9 +26,9 @@ abstract class AbstractJsonSerializeObjData
      * Convert object to array with private and protected proprieties.
      * Private parent class proprieties aren't considered.
      *
-     * @param object   $obj        obejct to serialize
-     * @param int      $flags      flags bitmask
-     * @param string[] $objParents objs parents unique objects hash list
+     * @param object         $obj        obejct to serialize
+     * @param int            $flags      flags bitmask
+     * @param int[]|string[] $objParents objs parents unique objects hash list
      *
      * @return mixed[]
      */
@@ -81,9 +80,9 @@ abstract class AbstractJsonSerializeObjData
     /**
      * Recursive parse values, all objects are transformed to array
      *
-     * @param mixed    $value      valute to parse
-     * @param int      $flags      flags bitmask
-     * @param string[] $objParents objs parents unique hash ids
+     * @param mixed          $value      valute to parse
+     * @param int            $flags      flags bitmask
+     * @param int[]|string[] $objParents objs parents unique hash or ids after PHP 7.2
      *
      * @return mixed
      */
@@ -105,7 +104,7 @@ abstract class AbstractJsonSerializeObjData
                 return $result;
             case "object":
                 /** @var object $value */
-                $objHash = spl_object_hash($value);
+                $objHash = self::getObjIdentifier($value);
                 if (in_array($objHash, $objParents)) {
                     // prevent infinite recursion loop
                     return null;
@@ -272,5 +271,23 @@ abstract class AbstractJsonSerializeObjData
         /** @var false|string $result */
         $result = (isset($array[self::CLASS_KEY_FOR_JSON_SERIALIZE]) ? $array[self::CLASS_KEY_FOR_JSON_SERIALIZE] : false);
         return $result;
+    }
+
+    /**
+     * Get object unique identifier
+     *
+     * @param object $obj input object
+     *
+     * @return int|string
+     */
+    final protected static function getObjIdentifier($obj)
+    {
+        static $useObjId = null;
+
+        if (is_null($useObjId)) {
+            $useObjId = function_exists('spl_object_id');
+        }
+
+        return ($useObjId ? spl_object_id($obj) : spl_object_hash($obj));
     }
 }
