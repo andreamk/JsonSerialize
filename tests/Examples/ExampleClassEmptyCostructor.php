@@ -32,7 +32,7 @@ class ExampleClassEmptyCostructor
     public function __construct()
     {
         if ($this->privateProp) {
-            $this->privateProp ++;
+            $this->privateProp++;
         }
     }
 
