@@ -50,7 +50,7 @@ class JsonUnserializeMap
      */
     public function __construct($map = [])
     {
-        if (!is_array($map)) { // @phpstan-ignore function.alreadyNarrowedType 
+        if (!is_array($map)) { // @phpstan-ignore function.alreadyNarrowedType
             throw new Exception('map must be an array');
         }
         $this->map = new MapItem();
