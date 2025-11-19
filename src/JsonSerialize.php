@@ -114,7 +114,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
     public static function unserializeToObj($json, $obj, $depth = 512, $flags = 0)
     {
         if (is_object($obj)) {
-        } elseif (is_string($obj) && class_exists($obj)) {
+        } elseif (is_string($obj) && class_exists($obj)) { // @phpstan-ignore function.alreadyNarrowedType
             $obj = self::getObjFromClass($obj);
         } else {
             throw new Exception('invalid obj param');
@@ -210,7 +210,7 @@ class JsonSerialize extends AbstractJsonSerializeObjData
         if ($use_mb) {
             $encoding = mb_detect_encoding($string, null, true);
             if ($encoding) {
-                return mb_convert_encoding($string, 'UTF-8', $encoding);
+                return (string) mb_convert_encoding($string, 'UTF-8', $encoding);
             } else {
                 return mb_convert_encoding($string, 'UTF-8', 'UTF-8');
             }

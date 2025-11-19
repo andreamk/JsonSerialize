@@ -46,11 +46,11 @@ class JsonUnserializeMap
     /**
      * Class constructor
      *
-     * @param array<string, string> $map values map
+     * @param array<string,string> $map values map
      */
     public function __construct($map = [])
     {
-        if (!is_array($map)) {
+        if (!is_array($map)) { // @phpstan-ignore function.alreadyNarrowedType 
             throw new Exception('map must be an array');
         }
         $this->map = new MapItem();
