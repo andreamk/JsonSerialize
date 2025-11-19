@@ -69,7 +69,9 @@ abstract class AbstractJsonSerializeObjData
             if ($includeProps !==  true && !in_array($propName, $includeProps)) {
                 continue;
             }
-            $prop->setAccessible(true);
+            if (PHP_VERSION_ID < 80100) {
+                $prop->setAccessible(true);
+            }
             $propValue = $prop->getValue($obj);
             $result[$propName] = self::valueToJsonData($propValue, $flags, $objParents);
         }
@@ -237,7 +239,9 @@ abstract class AbstractJsonSerializeObjData
             } else {
                 $reflect = new ReflectionObject($obj);
                 foreach ($reflect->getProperties() as $prop) {
-                    $prop->setAccessible(true);
+                    if (PHP_VERSION_ID < 80100) {
+                        $prop->setAccessible(true);
+                    }
                     $propName = $prop->getName();
                     if ($map !== null) {
                         $map->setCurrent($propName, $current);
